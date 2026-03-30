@@ -1,4 +1,4 @@
-USE dishwish;
+USE wishdish;
 
 -- Insertar Categorías
 INSERT INTO categories (name) VALUES ('Entrantes'), ('Hamburguesas'), ('Bebidas');

@@ -1,5 +1,6 @@
 -- Usamos tu base de datos
-USE dishwish;
+CREATE DATABASE IF NOT EXISTS wishdish;
+USE wishdish;
 
 -- 1. Categorías
 CREATE TABLE categories (
