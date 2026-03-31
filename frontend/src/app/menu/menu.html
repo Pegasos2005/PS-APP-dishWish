@@ -8,34 +8,27 @@
   <div class="body-menu">
 
     <aside class="category-column">
-      <h2>Titulo</h2>
-      <button class="category-btn">Section 1</button>
-      <button class="category-btn">Section 2</button>
-      <button class="category-btn">Section 3</button>
-      <button class="category-btn">Section 4</button>
-
+      <h2>Menú</h2>
+      @for(category of menuCategories; track category.category_id){
+        <button class="category-btn">
+          {{ category.category_name}}
+        </button>
+      }
       <button class="show-order-btn">show order</button>
     </aside>
 
+
     <main class="product-column">
 
-      <div class="product-card">
-        <div class="placeholder-image"></div>
-        <div class="product-info">Descrip</div>
-        <button class="add-btn">+</button>
-      </div>
+      @for (category of menuCategories; track category.category_id){
+        <section>
+          <h2 class="section-title">{{ category.category_name }}</h2>
 
-      <div class="product-card">
-        <div class="placeholder-image"></div>
-        <div class="product-info">Descrip</div>
-        <button class="add-btn">+</button>
-      </div>
-
-      <div class="product-card">
-        <div class="placeholder-image"></div>
-        <div class="product-info">Descrip</div>
-        <button class="add-btn">+</button>
-      </div>
+          @for (p of category.products; track p.id){
+            <app-product-card [product]="p"></app-product-card>
+          }
+        </section>
+      }
 
     </main>
   </div>

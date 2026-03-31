@@ -1,7 +1,7 @@
 export const DATA_MENU = [
   {
     category_id: 1,
-    catgory_name: 'Entrantes',
+    category_name: 'Entrantes',
     products: [
       {
         id: 101,
@@ -31,7 +31,7 @@ export const DATA_MENU = [
 
   {
     category_id: 2,
-    catgory_name: 'Hamburguesas',
+    category_name: 'Hamburguesas',
     products: [
       {
         id:104,
@@ -72,7 +72,7 @@ export const DATA_MENU = [
 
   {
     category_id: 3,
-    catgory_name: 'Guarniciones',
+    category_name: 'Guarniciones',
     products: [
       {
         id: 108,
@@ -111,7 +111,7 @@ export const DATA_MENU = [
 
   {
     category_id: 4,
-    catgory_name: 'Postres',
+    category_name: 'Postres',
     products: [
       {
         id: 108,
@@ -149,7 +149,7 @@ export const DATA_MENU = [
 
   {
     category_id: 5,
-    catgory_name: 'Bebidas',
+    category_name: 'Bebidas',
     products: [
       {
         id: 108,
