@@ -1,0 +1,33 @@
+/* Contenedor para posicionar el botón al final de la vista */
+.seccion-acciones {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  margin-top: 50px;
+}
+
+/* Estilos específicos del botón */
+.boton-enviar-comanda {
+  background-color: #ff4757; /* Un rojo/naranja llamativo */
+  color: white;
+  border: none;
+  padding: 15px 32px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px; /* Estilo píldora, muy moderno */
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Interacción visual (Feedback de usuario) */
+.boton-enviar-comanda:hover {
+  background-color: #ff6b81;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 71, 87, 0.4);
+}
+
+.boton-enviar-comanda:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(255, 71, 87, 0.2);
+}
