@@ -16,3 +16,12 @@ la mesa existe, y si el producto tiene stock".
 📂 controllers: El Camarero.
 Recibirán las peticiones de Angular y se las mandará a services y
 devolverá las respuestas a Angular
+
+📂 dtos: Datos que manejará nuestro Sprint
+Piensa en tus Models (Order, Product, DiningTable) como los estructuras
+reales y pesadas que están en la la base de datos. Tienen un montón de
+datos: fechas de creación, estados, relaciones complejas entre ellos...
+El DTO es simplemente una versión más simplicada para que Sprint trabaje
+con una estructura más ligera.
+Por ejemplo, para las comandas, solo necesita el número de la mesa y
+el id de los productos que ha pedido (OrderRequestDTO)
