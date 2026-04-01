@@ -135,11 +135,9 @@ Acceder a la aplicación en: **http://localhost:4200**
 
 ## Gestión de la Base de Datos
 
-### ⚠️ POLÍTICA DE GESTIÓN DE DATOS - LEER OBLIGATORIAMENTE
+### ⚠️ POLÍTICA DE GESTIÓN DE DATOS
 
 **Este proyecto usa JPA/Hibernate para gestionar el esquema de la base de datos.**
-
-### Reglas NO Negociables:
 
 1. **NUNCA ejecutes scripts SQL directamente** (`schema.sql`, `data.sql`)
 2. **SIEMPRE define las tablas** mediante entidades Java en `backend/src/main/java/com/wishdish/backend/entity/`
