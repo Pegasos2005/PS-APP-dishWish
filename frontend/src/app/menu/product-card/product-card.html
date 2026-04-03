@@ -3,9 +3,9 @@
 
   <div class="product-info">
     <h3>{{ product.product_name }}</h3>
-    <p>{{ product.descripcion }}</p>
+    <p>{{ product.description }}</p>
     <span class="price"> {{ product.price }} €</span>
   </div>
 
-  <button class="add-btn">+</button>
+  <button class="add-btn" (click)="onAddClick()">+</button>
 </div>
