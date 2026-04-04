@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from './product.interface';
+import { OrderService } from '../../services/order';
 
 @Component({
   selector: 'app-product-card',
@@ -10,10 +11,11 @@ import { Product } from './product.interface';
 
 export class ProductCard {
   @Input() product!: Product;
-  @Output() addToCart = new EventEmitter<Product>();
 
-  // Para que se incremente el contador cuando le damos al boton +
+  // nota: si se le pone private/public ya hace la asignacion automaticamente: this.orderService = orderService
+  constructor(private orderService: OrderService) {}
+
   onAddClick(){
-    this.addToCart.emit(this.product);
+    this.orderService.addProduct(this.product)
   }
 }

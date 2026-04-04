@@ -18,8 +18,9 @@
       }
       <button class="show-order-btn">
         show order
-        @if(cartCount > 0) {
-          <span class="cart-count">{{ cartCount }}</span>
+
+        @if (orderService.totalItems >= 0) {
+          <span class="cart-count">{{ orderService.totalItems }}</span>
         }
       </button>
     </aside>
@@ -37,10 +38,7 @@
           </h2>
 
           @for (p of category.products; track p.id){
-            <app-product-card
-              [product]="p"
-              (addToCart)="onAddToCart($event)">
-            </app-product-card>
+            <app-product-card [product]="p"></app-product-card>
           }
         </section>
       }

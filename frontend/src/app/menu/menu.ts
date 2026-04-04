@@ -1,7 +1,8 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';           // Importante para que funcionen cosas básicas
 import { DATA_MENU } from './menu.mock';                  // Importar el json
 import { ProductCard } from './product-card/product-card';
+import { OrderService } from '../services/order';
 
 @Component({
   selector: 'app-menu',
@@ -12,12 +13,8 @@ import { ProductCard } from './product-card/product-card';
 export class Menu {
   menuCategories = DATA_MENU;
   selectedCategory: number | null=null;
-  cartCount: number = 0;
 
-  onAddToCart(product: any) {
-    this.cartCount++;
-    console.log(`Añadiste ${product.product_name} al carrito`);
-  }
+  constructor(public orderService: OrderService) {}
 
   // Cuando se hace click en un botón de categoría
   scrollToCategory(categoryId: number) {
