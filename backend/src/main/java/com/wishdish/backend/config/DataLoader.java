@@ -1,9 +1,11 @@
 package com.wishdish.backend.config;
 
-import com.wishdish.backend.entity.Categoria;
-import com.wishdish.backend.entity.Producto;
-import com.wishdish.backend.repository.CategoriaRepository;
-import com.wishdish.backend.repository.ProductoRepository;
+import com.wishdish.backend.models.Categoria;
+import com.wishdish.backend.models.Producto;
+import com.wishdish.backend.models.Mesa;
+import com.wishdish.backend.repositories.CategoriaRepository;
+import com.wishdish.backend.repositories.ProductoRepository;
+import com.wishdish.backend.repositories.MesaRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +35,8 @@ public class DataLoader {
     @Bean
     CommandLineRunner initDatabase(
             CategoriaRepository categoriaRepository,
-            ProductoRepository productoRepository) {
+            ProductoRepository productoRepository,
+            MesaRepository mesaRepository) {
 
         return args -> {
             // Solo cargar datos si la BD está vacía
@@ -43,6 +46,14 @@ public class DataLoader {
             }
 
             System.out.println("🔄 Cargando datos de prueba en la base de datos...");
+
+            // ===========================
+            // CREAR MESAS
+            // ===========================
+            for (int i = 1; i <= 10; i++) {
+                mesaRepository.save(new Mesa(i));
+            }
+            System.out.println("   ✓ 10 mesas creadas");
 
             // ===========================
             // CREAR CATEGORÍAS
@@ -232,11 +243,13 @@ public class DataLoader {
             // ===========================
             long totalCategorias = categoriaRepository.count();
             long totalProductos = productoRepository.count();
+            long totalMesas = mesaRepository.count();
 
             System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             System.out.println("✅ Base de datos inicializada correctamente");
             System.out.println("   📁 Categorías: " + totalCategorias);
             System.out.println("   🍔 Productos: " + totalProductos);
+            System.out.println("   🪑 Mesas: " + totalMesas);
             System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         };
     }
