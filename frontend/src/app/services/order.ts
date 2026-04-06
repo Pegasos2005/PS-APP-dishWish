@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { Producto } from '../models/producto.model';
 import { OrderItem } from './orderItem.interface';
 
@@ -7,7 +7,8 @@ import { OrderItem } from './orderItem.interface';
 })
 export class OrderService {
   order: OrderItem[] = [];
-  totalItems: number = 0;
+  private _totalItems = signal(0);
+  totalItems = computed(() => this._totalItems());
 
   addProduct(productToAdd: Producto) {
     const existingItem = this.order.find(item => item.product.id === productToAdd.id);
@@ -21,7 +22,7 @@ export class OrderService {
       });
     }
 
-    this.totalItems++;
+    this._totalItems.update(val => val + 1);
   }
 
   decreaseProduct(productToRemove: Producto) {
@@ -29,7 +30,7 @@ export class OrderService {
 
     if (index !== -1) {
       this.order[index].quantity--;
-      this.totalItems--;
+      this._totalItems.update(val => val - 1);
 
       if (this.order[index].quantity === 0) {
         this.order.splice(index, 1);
@@ -39,6 +40,6 @@ export class OrderService {
 
   clear() {
     this.order = [];
-    this.totalItems = 0;
+    this._totalItems.set(0);
   }
 }

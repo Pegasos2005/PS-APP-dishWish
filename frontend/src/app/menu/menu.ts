@@ -46,7 +46,7 @@ export class Menu implements OnInit {
   }
 
   sendOrder() {
-    if (this.orderService.totalItems === 0) {
+    if (this.orderService.totalItems() === 0) {
       alert('El carrito está vacío');
       return;
     }
