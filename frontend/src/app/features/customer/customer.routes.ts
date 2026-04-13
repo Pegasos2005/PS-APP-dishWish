@@ -7,11 +7,11 @@ export const CUSTOMER_ROUTES: Routes = [
     path: 'customer-home',
     loadComponent: () => import('./customer-home/customer-home.component').then(c => c.CustomerHomeComponent)
   },
-/*
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.component').then(c => c.HomeComponent)
+    path: 'customer-menu',
+    loadComponent: () => import('./customer-menu/customer-menu.component').then(c => c.CustomerMenuComponent)
   },
+/*
   {
     path: 'menu',
     loadComponent: () => import('./menu/menu.component').then(c => c.MenuComponent)

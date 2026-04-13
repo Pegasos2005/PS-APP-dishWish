@@ -18,11 +18,11 @@ export class CustomerHomeComponent {
 
   startOrdering(): void {
     console.log('Navegando al catálogo de menú');
-    this.router.navigate(['/customer/menu']);
+    this.router.navigate(['/customer/customer-menu']);
   }
 
   watchOrders(): void {
     console.log('Navegando a la vista del ticket');
-    this.router.navigate(['/customer/ticket']);
+    this.router.navigate(['/customer/customer-ticket']);
   }
 }

@@ -1,0 +1,40 @@
+<div class="principal-container">
+
+  <header class="head">
+    <img src="assets/logo.png" alt="logo" style="height: 40px;">
+    <button class="return-button" routerLink="/customer/customer-home" aria-label="Go back">&lt;</button>
+  </header>
+
+  <div class="body-menu">
+    <aside class="category-column">
+      @for(category of menuCategories(); track category.categoryId) {
+      <button class="category-btn"
+              [class.active]="selectedCategory === category.categoryId"
+              (click)="scrollToCategory(category.categoryId)">
+        {{ category.categoryName }}
+      </button>
+      }
+
+      <button class="show-order-btn" routerLink="/customer/ticket">
+        Show Order
+        @if (orderService.totalItems() > 0) {
+        <span class="cart-count">{{ orderService.totalItems() }}</span>
+        }
+      </button>
+    </aside>
+
+    <main class="product-column" #productColumn (scroll)="onScroll($event)">
+      @for (category of menuCategories(); track category.categoryId) {
+      <section [attr.data-category-id]="category.categoryId">
+        <h2 class="section-title">
+          {{ category.categoryName }}
+        </h2>
+
+        @for (product of category.products; track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+        }
+      </section>
+      }
+    </main>
+  </div>
+</div>
