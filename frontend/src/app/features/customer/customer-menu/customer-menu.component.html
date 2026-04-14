@@ -15,7 +15,7 @@
       </button>
       }
 
-      <button class="show-order-btn" routerLink="/customer/ticket">
+      <button class="show-order-btn" routerLink="/customer/show-order">
         Show Order
         @if (orderService.totalItems() > 0) {
         <span class="cart-count">{{ orderService.totalItems() }}</span>

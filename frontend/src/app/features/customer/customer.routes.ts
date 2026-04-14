@@ -11,6 +11,10 @@ export const CUSTOMER_ROUTES: Routes = [
     path: 'customer-menu',
     loadComponent: () => import('./customer-menu/customer-menu.component').then(c => c.CustomerMenuComponent)
   },
+  {
+    path: 'show-order',
+    loadComponent: () => import('./show-order/show-order.component').then(c => c.ShowOrderComponent)
+  },
 /*
   {
     path: 'menu',
