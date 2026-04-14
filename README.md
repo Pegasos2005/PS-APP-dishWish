@@ -25,8 +25,8 @@ Aplicación web para gestión de menú de restaurante. Sistema para visualizar p
 ## Requisitos
 
 - Java JDK 17 temurin
-- Node.js 18 
-- MySQL 8.0 
+- Node.js 18
+- MySQL 8.0
 
 ## Configuración Inicial
 
@@ -59,6 +59,19 @@ cd frontend
 npm install
 ```
 
+## Configurar el acceso público mediante la red privada
+
+### Configuración
+> Para Windows:
+En el menú de configuración, entra en Red e Internet -> Propiedades de tu WiFi. Y habilitado en Privada
+Luego busca en el menú de inicio: "Permitir una aplicación a través del Firewall de Windows". Pulsa "Cambiar la configuración" arriba a la derecha
+y busca "Java(TM) Platform SE binary" o "OpenJDK Platform binary" y marca tanto la casilla privada como pública
+
+Y por último ejecuta en la PowerShell *Como administrador*
+```bash
+New-NetFirewallRule -DisplayName "App Local" -Direction Inbound -Protocol TCP -LocalPort 8080,4200 -Action Allow
+```
+
 ## Ejecutar la Aplicación
 
 ### Backend (puerto 8080)
@@ -72,7 +85,7 @@ cd backend
 
 ```bash
 cd frontend
-npm start
+ng serve --host 0.0.0.0
 ```
 
 **Acceder a:** http://localhost:4200
@@ -122,7 +135,8 @@ SELECT * FROM productos;
 
 ## Gestión del Esquema de Base de Datos
 
-**IMPORTANTE:** Este proyecto usa JPA/Hibernate para gestionar las tablas automáticamente.
+> _[!IMPORTANT]_
+> Este proyecto usa JPA/Hibernate para gestionar las tablas automáticamente.
 
 - Las tablas se crean/actualizan desde las entidades Java en `backend/src/main/java/com/wishdish/backend/entity/`
 - **NO ejecutes scripts SQL** para crear o modificar tablas
@@ -219,7 +233,3 @@ ng serve --port 4201
 3. **Reiniciar ambos servidores** para ver los cambios
 
 ## Documentación Adicional
-
-- `backend/README.md` - Documentación detallada del backend
-- `frontend/INTEGRACION.md` - Guía de integración frontend-backend
-- `frontend/SIMPLIFICACION.md` - Historial de simplificaciones del frontend
