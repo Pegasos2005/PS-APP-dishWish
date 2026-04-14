@@ -1,0 +1,46 @@
+<div class="principal-container">
+  <header class="head">
+    <img src="assets/logo.png" alt="logo" style="height: 40px;">
+    <button class="return-button" routerLink="/customer/customer-menu" aria-label="Go back to menu">&lt;</button>
+  </header>
+
+  <div class="summary-wrapper">
+    <div class="summary-container">
+      <h2>Your Order</h2>
+
+      @for (item of orderService.order; track item.product.id) {
+      <div class="summary-card">
+        <img [src]="item.product.picture" alt="Photo of {{ item.product.name }}">
+
+        <div class="product-info">
+          <h3>{{ item.product.name }}</h3>
+          <p>{{ item.product.description }}</p>
+        </div>
+
+        <div class="right-zone">
+          <span class="price">{{ item.product.price }} €</span>
+
+          <div class="total-buttons">
+            <button class="btn-circle" (click)="decreaseQuantity(item.product)" aria-label="Decrease quantity">-</button>
+            <span class="quantity">{{ item.quantity }}</span>
+            <button class="btn-circle" (click)="increaseQuantity(item.product)" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+      </div>
+      }
+
+      @if (orderService.order.length === 0) {
+      <div class="empty-cart">
+        <p>Your cart is empty.</p>
+        <button class="btn-secondary" routerLink="/customer/customer-menu">Browse Menu</button>
+      </div>
+      } @else {
+      <button class="send-order-btn" (click)="sendOrder()">
+        Send Order to Kitchen
+        <span class="cart-count">{{ orderService.totalItems() }}</span>
+      </button>
+      }
+
+    </div>
+  </div>
+</div>

@@ -1,379 +1,235 @@
-# Frontend - WishDish
+# WishDish
 
-Aplicación web para visualización del menú de WishDish, construida con Angular 19.
+Aplicación web para gestión de menú de restaurante. Sistema para visualizar productos organizados por categorías.
+
+## Estado Actual del Proyecto
+
+**Funcionalidades implementadas:**
+- Vista de menú con productos organizados por categorías
+- Carga automática de datos de prueba desde la base de datos
+- 5 categorías: Entrantes, Hamburguesas, Guarniciones, Postres, Bebidas
+- 19 productos distribuidos en las categorías
+- API REST completa para menú, categorías y productos
 
 ## Tecnologías
 
+**Backend:**
+- Java 17 + Spring Boot 4.0.5
+- MySQL 8.0
+- JPA/Hibernate (gestión automática de esquema)
+
+**Frontend:**
 - Angular 19
 - TypeScript
-- Node.js 18+
-- Angular Signals (gestión de estado)
 
 ## Requisitos
 
-- Node.js 18 o superior
-- npm 9 o superior
+- Java JDK 17 temurin
+- Node.js 18
+- MySQL 8.0
 
-### Verificar versiones
+## Configuración Inicial
 
-```bash
-node --version   # >= v18
-npm --version    # >= v9
+### 1. Base de Datos
+
+Crear la base de datos en MySQL:
+
+```sql
+CREATE DATABASE wishdish CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-## Instalación
+La aplicación está configurada para usar:
+- **Usuario:** root
+- **Contraseña:** root
+- **Base de datos:** wishdish
 
+Si necesitas cambiar estas credenciales, edita `backend/src/main/resources/application.properties`
+
+### 2. Instalación de Dependencias
+
+**Backend:**
+```bash
+cd backend
+./mvnw clean install
+```
+
+**Frontend:**
 ```bash
 cd frontend
 npm install
 ```
 
-## Ejecución
+## Configurar el acceso público mediante la red privada
+
+## Configuración
+> Para Windows:
+En el menú de configuración, entra en Red e Internet -> Propiedades de tu WiFi. Y habilitado en Privada
+Luego busca en el menú de inicio: "Permitir una aplicación a través del Firewall de Windows". Pulsa "Cambiar la configuración" arriba a la derecha
+y busca "Java(TM) Platform SE binary" o "OpenJDK Platform binary" y marca tanto la casilla privada como pública
+
+Y por último ejecuta en la PowerShell *Como administrador*
+```bash
+New-NetFirewallRule -DisplayName "App Local" -Direction Inbound -Protocol TCP -LocalPort 8080,4200 -Action Allow
+```
+
+## Ejecutar la Aplicación
+
+### Backend (puerto 8080)
 
 ```bash
-npm start
+cd backend
+./mvnw spring-boot:run
 ```
 
-O alternativamente:
+### Frontend (puerto 4200)
 
 ```bash
-ng serve
+cd frontend
+ng serve --host 0.0.0.0
 ```
 
-La aplicación estará disponible en: **http://localhost:4200**
+**Acceder a:** http://localhost:4200
 
-### Con puerto personalizado
+## Gestión de Datos de la Base de Datos
 
+### Población Automática
+
+Al iniciar el backend por primera vez, se ejecuta automáticamente la clase `DataLoader.java` que carga:
+- 5 categorías
+- 19 productos
+
+El backend detecta si ya hay datos y NO los vuelve a cargar en inicios posteriores.
+
+### Borrar Todos los Datos
+
+Si necesitas resetear la base de datos y que se ejecute la población de nuevo:
+
+**Opción 1: Desde MySQL**
+```sql
+USE wishdish;
+DELETE FROM productos;
+DELETE FROM categorias;
+```
+
+**Opción 2: Borrar y recrear toda la BD**
+```sql
+DROP DATABASE wishdish;
+CREATE DATABASE wishdish CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Después de borrar los datos, al reiniciar el backend se ejecutará automáticamente el `DataLoader`.
+
+### Verificar el Estado de la BD
+
+```sql
+USE wishdish;
+
+-- Ver cantidad de datos
+SELECT COUNT(*) FROM categorias;  -- Debe ser 5
+SELECT COUNT(*) FROM productos;   -- Debe ser 19
+
+-- Ver todos los datos
+SELECT * FROM categorias;
+SELECT * FROM productos;
+```
+
+## Gestión del Esquema de Base de Datos
+
+> _[!IMPORTANT]_
+> Este proyecto usa JPA/Hibernate para gestionar las tablas automáticamente.
+
+- Las tablas se crean/actualizan desde las entidades Java en `backend/src/main/java/com/wishdish/backend/entity/`
+- **NO ejecutes scripts SQL** para crear o modificar tablas
+- La configuración `spring.jpa.hibernate.ddl-auto=update` mantiene el esquema sincronizado
+
+### Añadir o Modificar Tablas
+
+1. Crear o editar la clase `@Entity` correspondiente en el paquete `entity`
+2. Reiniciar la aplicación
+3. Hibernate aplicará los cambios automáticamente
+
+## API REST - Endpoints Principales
+
+**Base URL:** http://localhost:8080
+
+### Menú Completo
+- `GET /api/menu` - Menú completo (categorías con sus productos)
+- `GET /api/menu/disponibles` - Solo productos disponibles
+
+### Categorías
+- `GET /api/categorias` - Listar todas
+- `GET /api/categorias/{id}` - Obtener por ID
+- `POST /api/categorias` - Crear nueva
+- `PUT /api/categorias/{id}` - Actualizar
+- `DELETE /api/categorias/{id}` - Eliminar
+
+### Productos
+- `GET /api/productos` - Listar todos
+- `GET /api/productos/{id}` - Obtener por ID
+- `GET /api/productos/categoria/{id}` - Productos de una categoría
+- `POST /api/productos` - Crear nuevo
+- `PUT /api/productos/{id}` - Actualizar
+- `PATCH /api/productos/{id}/disponibilidad?disponible=true` - Cambiar disponibilidad
+- `DELETE /api/productos/{id}` - Eliminar
+
+**Ejemplo de prueba:**
 ```bash
-ng serve --port 4300
-```
-
-### Abrir automáticamente en navegador
-
-```bash
-ng serve --open
-```
-
-## Estado Actual
-
-### Funcionalidades Implementadas
-
-- ✅ Vista de menú con productos organizados por categorías
-- ✅ Tarjetas de producto con imagen, nombre, descripción y precio
-- ✅ Sidebar de categorías
-- ✅ Scroll sincronizado entre categorías y productos
-- ✅ Contador de carrito y creación de comandas
-- ✅ Vista de camarero con listado de comandas activas
-- ✅ Navegación entre vista cliente y vista camarero
-- ✅ Sistema de rutas con Angular Router
-- ✅ Polling automático cada 3 segundos para actualizar comandas
-- ✅ Integración completa con API REST
-
-### Integración con Backend
-
-El frontend se comunica con el backend a través del servicio `MenuService` que consume la API REST.
-
-**Configuración:** Ver `src/app/app.config.ts`
-
-```typescript
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient()  // ← Habilitado para comunicación con backend
-  ]
-};
-```
-
-**Servicio:** Ver `src/app/services/menu.service.ts`
-
-El servicio carga los datos desde `http://localhost:8080/api/menu`
-
-**Importante:** El backend debe estar corriendo en el puerto 8080 para que funcione correctamente.
-
-## Arquitectura y Rutas
-
-### Sistema de Rutas
-
-La aplicación utiliza **Angular Router** para gestionar la navegación entre vistas:
-
-**Archivo:** `src/app/app.routes.ts`
-
-```typescript
-export const routes: Routes = [
-  { path: '', component: Menu },        // Vista cliente (por defecto)
-  { path: 'pedido', component: Pedido } // Vista camarero
-];
-```
-
-**Componente raíz:** El `App` component (`src/app/app.ts`) usa `<router-outlet>` para renderizar dinámicamente los componentes según la ruta activa.
-
-### Flujo de Navegación
-
-```
-┌─────────────────────────────────────────┐
-│  http://localhost:4200/                 │
-│  ↓                                       │
-│  Menu Component (Vista Cliente)         │
-│  - Mostrar productos                    │
-│  - Agregar al carrito                   │
-│  - Botón "Send Order"                   │
-│  - Botón "Vista Camarero" → /pedido     │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│  http://localhost:4200/pedido           │
-│  ↓                                       │
-│  Pedido Component (Vista Camarero)      │
-│  - Listar comandas activas              │
-│  - Actualización automática (polling)   │
-│  - Botón "Vista Cliente" → /            │
-└─────────────────────────────────────────┘
+curl http://localhost:8080/api/menu
 ```
 
 ## Estructura del Proyecto
 
 ```
-frontend/
-├── src/app/
-│   ├── menu/                      # Vista cliente - Menú
-│   │   ├── menu.ts               # Lógica: carrito, navegación
-│   │   ├── menu.html             # Template con categorías/productos
-│   │   ├── menu.css              # Estilos
-│   │   └── product-card/         # Componente de tarjeta
-│   │       ├── product-card.ts
-│   │       ├── product-card.html
-│   │       └── product-card.css
-│   ├── pedido/                    # Vista camarero - Comandas
-│   │   ├── pedido.ts             # Lógica: polling, navegación
-│   │   ├── pedido.html           # Template con grid de comandas
-│   │   └── pedido.css            # Estilos de tarjetas
-│   ├── models/                    # Interfaces TypeScript
-│   │   ├── menu-categoria.model.ts
-│   │   ├── producto.model.ts
-│   │   └── comanda.model.ts      # DTOs de comandas
-│   ├── services/                  # Servicios HTTP
-│   │   ├── menu.service.ts       # API de menú
-│   │   └── comanda.service.ts    # API de comandas
-│   ├── app.ts                     # Componente raíz con <router-outlet>
-│   ├── app.html                   # Template raíz
-│   ├── app.config.ts              # Configuración (HttpClient, Router)
-│   └── app.routes.ts              # Definición de rutas
-├── assets/                        # Imágenes de productos
-├── index.html
-├── main.ts
-└── styles.css
-```
-
-## Componentes Principales
-
-### App Component (Raíz)
-
-**Ubicación:** `src/app/app.ts`
-
-**Responsabilidades:**
-- Renderizar `<router-outlet>` para navegación
-- Punto de entrada de la aplicación
-
-**Template:**
-```html
-<router-outlet></router-outlet>
-```
-
-### Menu Component (Vista Cliente)
-
-**Ubicación:** `src/app/menu/`
-**Ruta:** `/` (raíz)
-
-**Responsabilidades:**
-- Cargar menú desde la API
-- Mostrar categorías en sidebar
-- Mostrar productos agrupados por categoría
-- Gestionar scroll sincronizado
-- Gestionar carrito de compras
-- Crear comandas vía API
-- Navegación a vista camarero
-
-**Funcionalidades:**
-```typescript
-onAddToCart(product)      // Agregar producto al carrito
-sendOrder()               // Crear comanda en el backend
-navigateToPedido()        // Ir a vista camarero
-```
-
-### Pedido Component (Vista Camarero)
-
-**Ubicación:** `src/app/pedido/`
-**Ruta:** `/pedido`
-
-**Responsabilidades:**
-- Listar comandas activas (estados: en_cocina, servida)
-- Actualización automática cada 3 segundos (polling)
-- Mostrar items de cada comanda
-- Navegación a vista cliente
-
-**Características:**
-```typescript
-cargarComandasActivas()   // Carga inicial desde API
-iniciarPolling()          // Actualización automática
-navigateToMenu()          // Volver a vista cliente
-```
-
-**Datos mostrados:**
-- Número de mesa
-- Estado de comanda (En Cocina / Servida)
-- Lista de items con cantidad y nombre
-- Estado de cada item
-
-### ProductCard Component
-
-**Ubicación:** `src/app/menu/product-card/`
-
-**Responsabilidades:**
-- Mostrar información del producto
-- Emitir evento al agregar al carrito
-
-**Input/Output:**
-```typescript
-@Input() product!: Producto;
-@Output() addToCart = new EventEmitter<Producto>();
-```
-
-## Servicios
-
-### MenuService
-
-**Ubicación:** `src/app/services/menu.service.ts`
-
-**Endpoints:**
-- `GET http://localhost:8080/api/menu` - Obtener menú completo
-
-### ComandaService
-
-**Ubicación:** `src/app/services/comanda.service.ts`
-
-**Endpoints:**
-- `GET http://localhost:8080/api/comandas/activas` - Listar comandas activas
-- `POST http://localhost:8080/api/comandas` - Crear nueva comanda
-- `PUT http://localhost:8080/api/comandas/items/{id}/avanzar` - Avanzar estado de item
-
-## Scripts Disponibles
-
-```bash
-npm start          # Servidor de desarrollo
-npm run build      # Build de producción
-npm test           # Ejecutar tests
-```
-
-## Build de Producción
-
-```bash
-ng build --configuration=production
-```
-
-Los archivos compilados estarán en: `dist/frontend/browser/`
-
-**Características:**
-- Minificación de código
-- Optimización de bundle
-- Listo para deploy
-
-## Desarrollo
-
-### Agregar nuevo componente
-
-```bash
-ng generate component nombre-componente
-```
-
-### Agregar nuevo servicio
-
-```bash
-ng generate service services/nombre-servicio
-```
-
-### Agregar nueva interfaz
-
-```bash
-ng generate interface models/nombre-modelo
+PS-APP-dishWish/
+├── backend/
+│   ├── src/main/java/com/wishdish/backend/
+│   │   ├── controller/     # Endpoints REST
+│   │   ├── service/        # Lógica de negocio
+│   │   ├── repository/     # Acceso a datos (JPA)
+│   │   ├── entity/         # Entidades JPA (definen las tablas)
+│   │   └── dto/            # DTOs para respuestas
+│   └── src/main/resources/
+│       └── application.properties
+├── frontend/
+│   └── src/app/
+│       ├── menu/           # Componente principal del menú
+│       ├── models/         # Interfaces TypeScript
+│       └── services/       # Servicios para comunicación con API
+└── README.md
 ```
 
 ## Solución de Problemas
 
-### Error: Backend no responde
+### Error de conexión a MySQL
+- Verificar que MySQL esté corriendo
+- Verificar que la BD `wishdish` exista
+- Comprobar credenciales (root/root por defecto)
 
-**Verificar:**
-1. Backend está corriendo en `http://localhost:8080`
-2. MySQL está corriendo y tiene datos
-3. No hay errores CORS en la consola
-
-**Test rápido:**
+### Puerto 8080 ocupado
 ```bash
-curl http://localhost:8080/api/menu
-```
-
-### Error: Puerto 4200 ocupado
-
-```bash
-# Opción 1: Usar otro puerto
-ng serve --port 4300
-
-# Opción 2: Matar proceso (Windows)
-netstat -ano | findstr :4200
+# Windows
+netstat -ano | findstr :8080
 taskkill /PID <PID> /F
 ```
 
-### Error: Cannot find module
-
+### Puerto 4200 ocupado
 ```bash
-rm -rf node_modules package-lock.json
-npm install
+ng serve --port 4201
 ```
 
-### Productos no se muestran
+## Para Desarrolladores
 
-**Verificar en consola del navegador (F12):**
-1. ¿Hay errores HTTP?
-2. ¿La respuesta de `/api/menu` tiene datos?
-3. ¿El backend está corriendo?
+### Flujo de Trabajo Recomendado
 
-## CORS
+1. **Asegurar que la BD tenga datos:** Verificar con las consultas SQL de arriba
+2. **Iniciar backend:** Debe mostrar el mensaje de conexión exitosa a MySQL
+3. **Iniciar frontend:** Debe cargar los productos desde la API
+4. **Verificar en navegador:** http://localhost:4200 debe mostrar el menú con productos
 
-El backend ya está configurado para aceptar peticiones desde `http://localhost:4200`.
+### Añadir Nuevas Funcionalidades
 
-Si cambias el puerto del frontend, actualiza la configuración CORS en el backend (`WebConfig.java`).
-
-## Sintaxis de Angular 19
-
-El proyecto utiliza la nueva sintaxis de control flow de Angular 19:
-
-**Condicionales:**
-```html
-@if (condition) {
-  <div>Contenido</div>
-}
-```
-
-**Bucles:**
-```html
-@for (item of items; track item.id) {
-  <div>{{ item.name }}</div>
-}
-```
-
-**Nota:** La sintaxis antigua (`*ngIf`, `*ngFor`) no se utiliza en este proyecto.
-
-## Próximos Pasos
-
-- [ ] Implementar selector de mesa en vista cliente
-- [ ] Agregar funcionalidad de avance de estado de items
-- [ ] Crear servicio de carrito persistente (LocalStorage)
-- [ ] Agregar manejo de errores visual mejorado
-- [ ] Agregar loading states
-- [ ] Agregar filtros en vista camarero
+1. **Backend:** Crear/modificar entidades, servicios y controladores
+2. **Frontend:** Crear/modificar componentes y servicios
+3. **Reiniciar ambos servidores** para ver los cambios
 
 ## Documentación Adicional
-
-- **Angular 19:** https://angular.dev
-- **Integración:** Ver `INTEGRACION.md`
-- **Simplificaciones:** Ver `SIMPLIFICACION.md`
-- **API Backend:** Ver `../backend/README.md`

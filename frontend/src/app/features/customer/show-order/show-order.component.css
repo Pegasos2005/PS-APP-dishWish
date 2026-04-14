@@ -1,0 +1,167 @@
+:host {
+  display: block;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f9;
+  min-height: 100vh;
+}
+
+.summary-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+.summary-container {
+  background-color:#ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.summary-container h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 3px solid #ff3b30;
+  padding-bottom: 10px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 20px;
+}
+
+.summary-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.summary-card img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 12px;
+  background-color:#f0f2f5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.product-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.product-info h3 { margin: 0; font-size:16px; color: #000; }
+.product-info p { margin: 0; font-size:14px; color: #666; }
+
+.edit-btn {
+  background-color: #f0f2f5;
+  border: none;
+  border-radius: 15px;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  color: #666;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: all 0.3s;
+}
+
+.edit-btn:hover {
+  background-color: #e31b23;
+  color: white;
+}
+
+.right-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 110px;
+}
+
+.price { font-weight: bold; font-size: 18px; color: #000; }
+
+.total-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-circle {
+  background-color: #f0f2f5;
+  border: none;
+  border-radius: 50%;
+  font-size:18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #2c3e50;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-circle:hover { background-color: #d6d3d3; transform: scale(1.1); }
+.quantity { font-weight: bold; font-size: 1.1rem; min-width: 20px; text-align: center; }
+
+/* ESTILOS DEL BOTÓN SEND ORDER (traídos de pedido.css) */
+.send-order-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  position: relative;
+}
+
+.send-order-btn:hover:not(:disabled) {
+  background-color: #218838;
+  transform: scale(1.02);
+}
+
+.send-order-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #0a0a0a;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}

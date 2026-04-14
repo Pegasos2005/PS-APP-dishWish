@@ -1,0 +1,11 @@
+<div class="product-card">
+  <img [src]="product.picture" alt="Photo of {{ product.name }}" class="dish-image">
+
+  <div class="product-info">
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <span class="price">{{ product.price }} €</span>
+  </div>
+
+  <button class="add-btn" (click)="onAddClick()" aria-label="Add to order">+</button>
+</div>
