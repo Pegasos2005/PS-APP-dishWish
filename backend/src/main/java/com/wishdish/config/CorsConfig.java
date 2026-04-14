@@ -13,9 +13,9 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Aplica a todos los endpoints
-                        // Permitir tu IP local explícitamente
-                        .allowedOrigins("http://*:*", "http://localhost:*")
+                registry.addMapping("/**")
+                        // Fíjate bien en la palabra "Patterns" al final
+                        .allowedOriginPatterns("http://*:*", "http://localhost:*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
