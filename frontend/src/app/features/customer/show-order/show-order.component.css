@@ -165,3 +165,56 @@
   font-weight: bold;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
+
+/* --- SUSTITUYE TU BLOQUE .btn-secondary POR ESTE --- */
+
+.btn-secondary {
+  /* Estructura Base (de .home-button) */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centrado para el carrito */
+  gap: 1.5rem;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 12px; /* Estilo Pastilla */
+  cursor: pointer;
+  width: 20%;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  /* Colores y Gradiente (de .primary-action) */
+  background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  color: #ffffff;
+
+  /* Sombra y Animación */
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  margin-top: 20px; /* Para separarlo del resumen */
+}
+
+/* Efectos de Interacción */
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #505050 0%, #1a1a1a 100%);
+}
+
+.btn-secondary:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Si usas el contador de carrito encima del botón */
+.btn-secondary .cart-count {
+  background: #000; /* Negro puro para contrastar con el naranja */
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.empty-cart p {
+  margin-left: 2px; /* Ajusta este valor según cuánto lo quieras mover */
+  margin-top: -15px; /* Ajusta este valor según cuánto lo quieras mover */
+  color: #666;
+  font-size: 1.1rem;
+}

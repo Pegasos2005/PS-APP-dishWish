@@ -58,8 +58,8 @@ export class ShowOrderComponent {
         alert("Order sent to the kitchen successfully!");
         this.orderService.clear(); // Vaciamos el carrito tras el éxito
 
-        // Navegamos a la vista del ticket para que vea cómo se cocina
-        this.router.navigate(['/customer/customer-ticket']);
+        // Navegamos a la vista home devuelta
+        this.router.navigate(['/customer/customer-home']);
       },
       error: (err) => {
         console.error("Error sending order:", err);
