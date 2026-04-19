@@ -8,13 +8,25 @@
     <div class="summary-container">
       <h2>Your Order</h2>
 
-      @for (item of orderService.order; track item.product.id) {
+      @for (item of orderService.order; track $index) {
       <div class="summary-card">
         <img [src]="item.product.picture" alt="Photo of {{ item.product.name }}">
 
         <div class="product-info">
           <h3>{{ item.product.name }}</h3>
-          <p>{{ item.product.description }}</p>
+
+          @if (!item.product.selectedIngredients || item.product.selectedIngredients.length === 0) {
+            <p>{{ item.product.description }}</p>
+          }
+
+          @if (item.product.addedExtras && item.product.addedExtras.length > 0) {
+            <p class="extras-text"><strong>Extra:</strong> {{ item.product.addedExtras.join(', ') }}</p>
+          }
+
+          @if (item.product.removedDefaults && item.product.removedDefaults.length > 0) {
+            <p class="extras-text"><strong>Sin:</strong> {{ item.product.removedDefaults.join(', ') }}</p>
+          }
+
         </div>
 
         <div class="right-zone">

@@ -26,19 +26,41 @@ export class CustomerOrderService {
     return this.http.post(this.apiUrl, pedido);
   }
 
+  // Funcion auxiliar: convierte la lista de ingredientes en un texto ordenado para poder comparar
+  private getIngredientsSignature(product: any): string {
+    const extras = product.addedExtras ? [...product.addedExtras].sort().join('|') : '';
+    const removed = product.removedDefaults ? [...product.removedDefaults].sort().join('|') : '';
+    return extras + '###' + removed;
+  }
+
   // 2. GESTIÓN DEL CARRITO EN MEMORIA
-  addProduct(productToAdd: Producto) {
-    const existingItem = this.order.find(item => item.product.id === productToAdd.id);
+  addProduct(productToAdd: any) {
+
+    const signatureToAdd = this.getIngredientsSignature(productToAdd);
+
+    const existingItem = this.order.find(item =>
+      item.product.id === productToAdd.id &&
+      this.getIngredientsSignature(item.product) === signatureToAdd
+    );
+
     if (existingItem) {
       existingItem.quantity++;
     } else {
+      // hacemos copia profunda del producto para evitar referencias cruzadas
+      const newProduct = JSON.parse(JSON.stringify(productToAdd));
       this.order.push({ product: productToAdd, quantity: 1 });
     }
     this._totalItems.update(val => val + 1);
   }
 
-  decreaseProduct(productToRemove: Producto) {
-    const index = this.order.findIndex(item => item.product.id === productToRemove.id);
+  decreaseProduct(productToRemove: any) {
+
+    const signatureToRemove = this.getIngredientsSignature(productToRemove);
+
+    const index = this.order.findIndex(item =>
+      item.product.id === productToRemove.id && this.getIngredientsSignature(item.product) === signatureToRemove
+    );
+
     if (index !== -1) {
       this.order[index].quantity--;
       this._totalItems.update(val => val - 1);

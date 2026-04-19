@@ -11,6 +11,10 @@ export interface Producto {
   categoria?: Categoria;
   fechaCreacion?: string;
   fechaActualizacion?: string;
+
+  selectedIngredients?: string[];
+  addedExtras?: string[];
+  removedDefaults?: string[];
 }
 
 /**

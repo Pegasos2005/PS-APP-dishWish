@@ -218,3 +218,12 @@
   color: #666;
   font-size: 1.1rem;
 }
+
+.extras-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
+}
+.extras-text strong {
+  color: #333;
+}

@@ -48,9 +48,30 @@ export class CustomerDishDetailComponent implements OnInit {
    * Confirmar y añadir al carrito
    */
   confirmAddToCart() {
+
+    const addedExtras: string[] = [];
+    const removedDefaults: string[] = [];
+
+    if (this.product?.ingredients) {
+      this.product.ingredients.forEach((ing: any) => {
+        const isSelected = this.selectedIngredients.has(ing.id || ing.name);
+        const isDefault =
+          ing.isDefault === true || ing.default === true || String(ing.isDefault) === 'true';
+
+        if (isDefault && !isSelected) {
+          // Venía por defecto pero el cliente lo quitó
+          removedDefaults.push(ing.name);
+        } else if (!isDefault && isSelected) {
+          // Era un extra y el cliente lo añadió
+          addedExtras.push(ing.name);
+        }
+      });
+    }
+
     const itemWithIngredients = {
       ...this.product,
-      selectedIngredients: Array.from(this.selectedIngredients)
+      addedExtras: addedExtras,
+      removedDefaults: removedDefaults
     };
 
     this.addToCart.emit(itemWithIngredients);
