@@ -57,7 +57,7 @@ export class ShowOrderComponent {
 
     const orderPayload = {
       tableId: this.tableId,
-      productIds: itemsPayload
+      items: itemsPayload
     };
 
     console.log("Sending to kitchen:", orderPayload);
