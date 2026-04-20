@@ -30,7 +30,7 @@
         </div>
 
         <div class="right-zone">
-          <span class="price">{{ item.product.price }} €</span>
+          <span class="price">{{ (item.product.calculatedPrice || item.product.price) | number:'1.2-2' }} €</span>
 
           <div class="total-buttons">
             <button class="btn-circle" (click)="decreaseQuantity(item.product)" aria-label="Decrease quantity">-</button>
@@ -48,7 +48,7 @@
       </div>
       } @else {
       <button class="send-order-btn" (click)="sendOrder()">
-        <span>Send Order to Kitchen • {{ getTotalPrice() | number:'1.2-2' }} €</span>
+        <span>Send Order to Kitchen • {{ orderService.getTotalPrice() | number:'1.2-2' }} €</span>
         <span class="cart-count">{{ orderService.totalItems() }}</span>
       </button>
       }

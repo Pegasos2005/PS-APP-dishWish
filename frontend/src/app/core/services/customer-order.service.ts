@@ -48,7 +48,7 @@ export class CustomerOrderService {
     } else {
       // hacemos copia profunda del producto para evitar referencias cruzadas
       const newProduct = JSON.parse(JSON.stringify(productToAdd));
-      this.order.push({ product: productToAdd, quantity: 1 });
+      this.order.push({ product: newProduct, quantity: 1 });
     }
     this._totalItems.update(val => val + 1);
   }
@@ -78,4 +78,15 @@ export class CustomerOrderService {
   getSelectedProducts(): OrderItem[] {
     return this.order;
   }
+
+  getTotalPrice(): number {
+    return this.order.reduce((total, item) => {
+      // Cogemos el precio con extras (si lo hay) o el precio base
+      const priceToUse = item.product.calculatedPrice || item.product.price;
+
+      // Lo multiplicamos por la cantidad de ese mismo plato y lo sumamos al total
+      return total + (Number(priceToUse) * item.quantity);
+    }, 0);
+  }
+
 }

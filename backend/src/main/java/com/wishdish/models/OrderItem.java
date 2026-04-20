@@ -2,6 +2,8 @@ package com.wishdish.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
@@ -35,6 +37,10 @@ public class OrderItem {
 
     @Column(columnDefinition = "TEXT")
     private String observations;
+
+    // Precio base del producto + precio de los extras
+    @Column(name = "unit_price", precision = 10, scale = 2, nullable = false)
+    private BigDecimal unitPrice = BigDecimal.ZERO;
 
     public String getObservations() { return observations; }
     public void setObservations(String observations) { this.observations = observations; }
@@ -106,6 +112,10 @@ public class OrderItem {
     public void setItemNotes(String itemNotes) {
         this.itemNotes = itemNotes;
     }
+
+    public BigDecimal getUnitPrice() { return unitPrice; }
+
+    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
 
     @Override
     public String toString() {

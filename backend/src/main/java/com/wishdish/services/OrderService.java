@@ -2,18 +2,13 @@ package com.wishdish.services;
 
 import com.wishdish.dtos.OrderItemRequestDTO;
 import com.wishdish.dtos.OrderResponseDTO;
-import com.wishdish.models.DiningTable;
-import com.wishdish.models.Order;
-import com.wishdish.models.OrderItem;
-import com.wishdish.models.Product;
-import com.wishdish.repositories.DiningTableRepository;
-import com.wishdish.repositories.OrderItemRepository;
-import com.wishdish.repositories.OrderRepository;
-import com.wishdish.repositories.ProductRepository;
+import com.wishdish.models.*;
+import com.wishdish.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +28,8 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     // @Transactional asegura que si falla un plato, no se guarde la comanda a medias
     @Transactional
@@ -58,16 +55,34 @@ public class OrderService {
             item.setQuantity(itemRequest.getQuantity());
             item.setStatus(OrderItem.ItemStatus.in_kitchen);
 
+
+            // Precio base del plato
+            BigDecimal precioCalculado = product.getPrice();
+
             // Traducimos las listas a un texto para la cocina
             StringBuilder notes = new StringBuilder();
 
+            // si hay extras los sumamos
             if (itemRequest.getAddedExtras() != null && !itemRequest.getAddedExtras().isEmpty()) {
                 notes.append("Extra: ").append(String.join(", ", itemRequest.getAddedExtras())).append(". ");
+
+                // Buscamos cada ingrediente extra en la base de datos para saber su precio
+                for (String nombreExtra: itemRequest.getAddedExtras()) {
+
+                    Ingredient ingredient = ingredientRepository.findByName(nombreExtra).orElse(null);
+
+                    if (ingredient != null && ingredient.getExtraPrice() != null) {
+                        precioCalculado = precioCalculado.add(ingredient.getExtraPrice());
+                    }
+                }
             }
+
             if (itemRequest.getRemovedDefaults() != null && !itemRequest.getRemovedDefaults().isEmpty()) {
                 notes.append("Sin: ").append(String.join(", ", itemRequest.getRemovedDefaults())).append(".");
             }
 
+            // Guardamos el precio total en la linea de la comanda
+            item.setUnitPrice(precioCalculado);
             // Guardamos el texto en el plato
             item.setObservations(notes.toString().trim());
 

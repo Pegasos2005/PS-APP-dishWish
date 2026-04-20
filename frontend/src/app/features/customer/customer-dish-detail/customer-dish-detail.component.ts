@@ -44,6 +44,29 @@ export class CustomerDishDetailComponent implements OnInit {
     return this.selectedIngredients.has(ingredientId);
   }
 
+  // Para saber si un ingrediente es por defecto
+  isDefaultIngredient(ing: any): boolean {
+    return ing.isDefault === true || ing.default === true || String(ing.isDefault) === 'true';
+  }
+
+  /**
+   * Calcula el precio en tiempo real (Base + Extras seleccionados)
+   */
+  calcularPrecioTotal(): number {
+    let total = Number(this.product?.price) || 0;
+
+    if (this.product?.ingredients) {
+      this.product.ingredients.forEach((ing: any) => {
+        // Si ESTÁ seleccionado y NO es por defecto, sumamos su precio extra
+        if (this.isIngredientSelected(ing.id || ing.name) && !this.isDefaultIngredient(ing)) {
+          total += Number(ing.extraPrice) || 0;
+        }
+      });
+    }
+
+    return total;
+  }
+
   /**
    * Confirmar y añadir al carrito
    */
@@ -55,8 +78,7 @@ export class CustomerDishDetailComponent implements OnInit {
     if (this.product?.ingredients) {
       this.product.ingredients.forEach((ing: any) => {
         const isSelected = this.selectedIngredients.has(ing.id || ing.name);
-        const isDefault =
-          ing.isDefault === true || ing.default === true || String(ing.isDefault) === 'true';
+        const isDefault = this.isDefaultIngredient(ing);
 
         if (isDefault && !isSelected) {
           // Venía por defecto pero el cliente lo quitó
@@ -70,6 +92,7 @@ export class CustomerDishDetailComponent implements OnInit {
 
     const itemWithIngredients = {
       ...this.product,
+      calculatedPrice: this.calcularPrecioTotal(),
       addedExtras: addedExtras,
       removedDefaults: removedDefaults
     };

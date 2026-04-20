@@ -2,11 +2,14 @@ package com.wishdish.dtos;
 
 import com.wishdish.models.Ingredient;
 
+import java.math.BigDecimal;
+
 public class IngredientDTO {
     private Integer id;
     private String name;
     private String description;
     private Boolean isDefault;
+    private BigDecimal extraPrice;
 
     public IngredientDTO() {
     }
@@ -15,6 +18,7 @@ public class IngredientDTO {
         this.id = ingredient.getId();
         this.name = ingredient.getName();
         this.description = ingredient.getDescription();
+        this.extraPrice = ingredient.getExtraPrice();
     }
 
     // Getters y Setters
@@ -48,4 +52,8 @@ public class IngredientDTO {
     public void setIsDefault(Boolean isDefault) {
         this.isDefault = isDefault;
     }
+
+    public BigDecimal getExtraPrice() { return extraPrice; }
+
+    public void setExtraPrice(BigDecimal extraPrice) { this.extraPrice = extraPrice; }
 }

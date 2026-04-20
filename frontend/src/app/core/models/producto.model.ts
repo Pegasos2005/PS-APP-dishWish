@@ -15,6 +15,7 @@ export interface Producto {
   selectedIngredients?: string[];
   addedExtras?: string[];
   removedDefaults?: string[];
+  calculatedPrice?: number
 }
 
 /**

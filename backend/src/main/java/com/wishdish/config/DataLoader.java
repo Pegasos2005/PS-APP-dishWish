@@ -124,46 +124,46 @@ public class DataLoader {
             System.out.println("   ✓ 4 bebidas creadas");
 
 
-            // =============================
-            // CREAR INGREDIENTES
-            // =============================
+            // ================================
+            // CREAR INGREDIENTES CON PRECIOS
+            // ================================
             System.out.println("   🍅 Creando ingredientes...");
 
             // Carnes y Proteínas
-            Ingredient carneVaca = crearIngrediente(ingredientRepository, "Carne 100% vaca gallega");
-            Ingredient carneAngus = crearIngrediente(ingredientRepository, "Carne picada de Angus");
-            Ingredient polloCrispy = crearIngrediente(ingredientRepository, "Pollo Crispy");
-            Ingredient pulledPork = crearIngrediente(ingredientRepository, "Pulled Pork casero");
-            Ingredient bacon = crearIngrediente(ingredientRepository, "Bacon crujiente");
-            Ingredient huevoFrito = crearIngrediente(ingredientRepository, "Huevo frito");
+            Ingredient carneVaca = crearIngrediente(ingredientRepository, "Carne 100% vaca gallega", "3.00");
+            Ingredient carneAngus = crearIngrediente(ingredientRepository, "Carne picada de Angus", "3.50");
+            Ingredient polloCrispy = crearIngrediente(ingredientRepository, "Pollo Crispy", "2.50");
+            Ingredient pulledPork = crearIngrediente(ingredientRepository, "Pulled Pork casero", "2.50");
+            Ingredient bacon = crearIngrediente(ingredientRepository, "Bacon crujiente", "1.50");
+            Ingredient huevoFrito = crearIngrediente(ingredientRepository, "Huevo frito", "1.00");
 
             // Quesos
-            Ingredient mezclaQuesos = crearIngrediente(ingredientRepository, "Mezcla de quesos");
-            Ingredient quesoCheddar = crearIngrediente(ingredientRepository, "Queso Cheddar fundido");
-            Ingredient quesoBlanco = crearIngrediente(ingredientRepository, "Queso blanco hilado");
+            Ingredient mezclaQuesos = crearIngrediente(ingredientRepository, "Mezcla de quesos", "1.20");
+            Ingredient quesoCheddar = crearIngrediente(ingredientRepository, "Queso Cheddar fundido", "1.00");
+            Ingredient quesoBlanco = crearIngrediente(ingredientRepository, "Queso blanco hilado", "1.50");
 
             // Vegetales y Salsas
-            Ingredient guacamole = crearIngrediente(ingredientRepository, "Guacamole");
-            Ingredient jalapenos = crearIngrediente(ingredientRepository, "Jalapeños");
-            Ingredient cebollaCaramelizada = crearIngrediente(ingredientRepository, "Cebolla Caramelizada");
-            Ingredient cebollaMorada = crearIngrediente(ingredientRepository, "Cebolla Morada");
-            Ingredient salsaMontana = crearIngrediente(ingredientRepository, "Salsa Montana");
-            Ingredient salsaEmmy = crearIngrediente(ingredientRepository, "Salsa Emmy");
-            Ingredient salsaFrutosRojos = crearIngrediente(ingredientRepository, "Salsa de frutos rojos");
+            Ingredient guacamole = crearIngrediente(ingredientRepository, "Guacamole", "1.50");
+            Ingredient jalapenos = crearIngrediente(ingredientRepository, "Jalapeños", "0.80");
+            Ingredient cebollaCaramelizada = crearIngrediente(ingredientRepository, "Cebolla Caramelizada", "0.80");
+            Ingredient cebollaMorada = crearIngrediente(ingredientRepository, "Cebolla Morada", "0.50");
+            Ingredient salsaMontana = crearIngrediente(ingredientRepository, "Salsa Montana", "0.80");
+            Ingredient salsaEmmy = crearIngrediente(ingredientRepository, "Salsa Emmy", "1.00");
+            Ingredient salsaFrutosRojos = crearIngrediente(ingredientRepository, "Salsa de frutos rojos", "0.80");
 
             // Panes y Bases
-            Ingredient panBrioche = crearIngrediente(ingredientRepository, "Pan Brioche");
-            Ingredient panBlackBrioche = crearIngrediente(ingredientRepository, "Pan Black Brioche");
-            Ingredient totopos = crearIngrediente(ingredientRepository, "Nachos (Totopos)");
-            Ingredient especiasCajun = crearIngrediente(ingredientRepository, "Mix especias Cajún");
+            Ingredient panBrioche = crearIngrediente(ingredientRepository, "Pan Brioche", "1.00");
+            Ingredient panBlackBrioche = crearIngrediente(ingredientRepository, "Pan Black Brioche", "1.20");
+            Ingredient totopos = crearIngrediente(ingredientRepository, "Nachos (Totopos)", "1.50");
+            Ingredient especiasCajun = crearIngrediente(ingredientRepository, "Mix especias Cajún", "0.50");
 
             // Postres y Bebidas
-            Ingredient toppingPistacho = crearIngrediente(ingredientRepository, "Topping de Pistacho");
-            Ingredient galletaLotus = crearIngrediente(ingredientRepository, "Polvo de galleta Lotus");
-            Ingredient heladoVainilla = crearIngrediente(ingredientRepository, "Bola de helado de Vainilla");
-            Ingredient siropeChocolate = crearIngrediente(ingredientRepository, "Salsa de chocolate");
-            Ingredient hielo = crearIngrediente(ingredientRepository, "Hielo");
-            Ingredient rodajaLimon = crearIngrediente(ingredientRepository, "Rodaja de limón");
+            Ingredient toppingPistacho = crearIngrediente(ingredientRepository, "Topping de Pistacho", "1.00");
+            Ingredient galletaLotus = crearIngrediente(ingredientRepository, "Polvo de galleta Lotus", "0.80");
+            Ingredient heladoVainilla = crearIngrediente(ingredientRepository, "Bola de helado de Vainilla", "1.50");
+            Ingredient siropeChocolate = crearIngrediente(ingredientRepository, "Salsa de chocolate", "0.50");
+            Ingredient hielo = crearIngrediente(ingredientRepository, "Hielo", "0.00");
+            Ingredient rodajaLimon = crearIngrediente(ingredientRepository, "Rodaja de limón", "0.00");
 
             // ================================
             // 2. UNIR INGREDIENTES CON PLATOS
@@ -279,8 +279,9 @@ public class DataLoader {
         return repo.save(p);
     }
 
-    private Ingredient crearIngrediente(IngredientRepository repo, String nombre) {
+    private Ingredient crearIngrediente(IngredientRepository repo, String nombre, String precioExtra) {
         Ingredient ing = new Ingredient(nombre);
+        ing.setExtraPrice(new BigDecimal(precioExtra));
         return repo.save(ing);
     }
 

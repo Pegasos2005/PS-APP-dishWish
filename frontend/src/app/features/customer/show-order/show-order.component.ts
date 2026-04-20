@@ -28,7 +28,10 @@ export class ShowOrderComponent {
   // --- NUEVA FUNCIÓN: Calcula el precio total del carrito ---
   getTotalPrice(): number {
     return this.orderService.order.reduce((total, item) => {
-      return total + (item.product.price * item.quantity);
+      // Cogemos el precio calculado (con extras) o el base si no hay extras
+      const priceToUse = item.product.calculatedPrice || item.product.price;
+
+      return total + (Number(priceToUse) * item.quantity);
     }, 0);
   }
 
