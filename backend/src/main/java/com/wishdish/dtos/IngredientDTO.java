@@ -4,6 +4,7 @@ import com.wishdish.models.Ingredient;
 
 import java.math.BigDecimal;
 
+// uyguyguiyi
 public class IngredientDTO {
     private Integer id;
     private String name;
@@ -56,4 +57,5 @@ public class IngredientDTO {
     public BigDecimal getExtraPrice() { return extraPrice; }
 
     public void setExtraPrice(BigDecimal extraPrice) { this.extraPrice = extraPrice; }
+
 }
