@@ -11,11 +11,21 @@ import { environment } from '../../../environments/environment';
 export class CustomerOrderService {
   private apiUrl = environment.apiUrl + 'orders';
 
+  tableId = signal<number | null>(null);
+
   order: OrderItem[] = [];
   private _totalItems = signal(0);
   totalItems = computed(() => this._totalItems());
 
   constructor(private http: HttpClient) {}
+
+  setTableId(id: number) {
+    this.tableId.set(id);
+  }
+
+  checkTableExists(tableNumber: number): Observable<boolean> {
+    return this.http.get<boolean>(`${environment.apiUrl}tables/${tableNumber}/exists`);
+  }
 
   getTicketByTable(tableId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/table/${tableId}`);
