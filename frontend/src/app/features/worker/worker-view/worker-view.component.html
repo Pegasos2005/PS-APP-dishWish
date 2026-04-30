@@ -1,7 +1,7 @@
 <div class="principal-container">
   <header class="head">
-    <img src="assets/logo.png" alt="Restaurant Logo" style="height: 40px;">
     <button class="return-button" routerLink="/join-as" aria-label="Go back">&lt;</button>
+    <img src="assets/logo.png" alt="Restaurant Logo">
   </header>
 
   <div class="body-camarero">
@@ -37,15 +37,15 @@
               </div>
 
               @if (item.observations ) {
-                <div class="item-modifications">
-                  <p> {{ item.observations }}</p>
-                </div>
+              <div class="item-modifications">
+                <p> {{ item.observations }}</p>
+              </div>
               }
 
               @if (item.itemNotes) {
-                <div class="customer-instructions">
-                  <p>💬 "{{ item.itemNotes }}"</p>
-                </div>
+              <div class="customer-instructions">
+                <p>💬 "{{ item.itemNotes }}"</p>
+              </div>
               }
             </article>
             }
