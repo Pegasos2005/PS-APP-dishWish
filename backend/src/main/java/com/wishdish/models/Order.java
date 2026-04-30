@@ -19,7 +19,7 @@ public class Order {
     private DiningTable diningTable;
 
     // Fechas en Java moderno. insertable = false hace que MySQL ponga la fecha automáticamente
-    @Column(name = "order_date", insertable = false, updatable = false)
+    @Column(name = "order_date")
     private LocalDateTime orderDate;
 
     // Le decimos a Java que guarde el Enum como Texto (String) en la base de datos
@@ -40,8 +40,12 @@ public class Order {
         paid
     }
 
-    // --- Constructor, Getters y Setters ---
+    @PrePersist
+    protected void onCreate() {
+        this.orderDate = LocalDateTime.now(); // Coge la hora exacta del sistema en ese instante
+    }
 
+    // --- Constructor, Getters y Setters ---
     public Order() {
     }
 
