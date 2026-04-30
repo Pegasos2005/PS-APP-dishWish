@@ -83,7 +83,7 @@ export class DashboardComponent {
 
   // Logout
   logout() {
-    this.authService.logoutAdmin();
+    this.authService.logout();
     this.router.navigate(['/join-as']);
   }
 }

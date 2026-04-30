@@ -18,20 +18,16 @@ export class PasswdAdminComponent {
   passwordError = signal<boolean>(false);
 
   verifyPassword(passwordInput: string): void {
-    const masterPassword = 'admin';
-
-    if (passwordInput === masterPassword) {
-      this.passwordError.set(false);
-
-      // 1. Avisamos al servicio de que el login es exitoso
-      this.authService.loginAdmin();
-
-      // 2. Navegamos al dashboard
-      this.router.navigate(['/admin/dashboard']);
-    } else {
-      this.passwordError.set(true);
-      setTimeout(() => this.passwordError.set(false), 3000);
-    }
+    this.authService.login(null, passwordInput).subscribe({
+      next: () => {
+        this.passwordError.set(false);
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: () => {
+        this.passwordError.set(true);
+        setTimeout(() => this.passwordError.set(false), 3000);
+      }
+    });
   }
 
   /**

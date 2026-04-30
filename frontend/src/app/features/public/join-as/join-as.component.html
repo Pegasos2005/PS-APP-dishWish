@@ -1,4 +1,7 @@
+<!-- src/app/features/public/join-as/join-as.component.html -->
 <div class="access-container">
+
+  <!-- LA TARJETA PRINCIPAL (Lo que se había borrado) -->
   <div class="access-card">
     <h1 class="access-title">Join As</h1>
     <div class="button-group">
@@ -8,29 +11,66 @@
     </div>
   </div>
 
+  <!-- MODAL DE MESA (Para el User) -->
   @if (isTableModalOpen()) {
-  <div class="modal-overlay">
-    <div class="modal-card">
-      <h2 class="modal-title">Enter Table Number</h2>
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title">Enter Table Number</h2>
 
-      <input
-        #tableInput
-        type="number"
-        class="table-input"
-        [class.error-shake]="tableError()"
-        placeholder="Ej. Num 5"
-        (keyup.enter)="confirmTable(tableInput.value)"
-        autofocus>
+        <input
+          #tableInput
+          type="number"
+          class="table-input"
+          [class.error-shake]="tableError()"
+          placeholder="e.g. 5"
+          (keyup.enter)="confirmTable(tableInput.value)"
+          autofocus>
 
-      @if (tableError()) {
-      <p class="error-text">{{ errorMessage() }}</p>
-      }
+        @if (tableError()) {
+          <p class="error-text">{{ errorMessage() }}</p>
+        }
 
-      <div class="modal-buttons">
-        <button class="access-button confirm-btn" (click)="confirmTable(tableInput.value)">Confirm</button>
-        <button class="access-button cancel-btn" (click)="closeModal()">Cancel</button>
+        <div class="modal-buttons">
+          <button class="access-button confirm-btn" (click)="confirmTable(tableInput.value)">Confirm</button>
+          <button class="access-button cancel-btn" (click)="closeAllModals()">Cancel</button>
+        </div>
       </div>
     </div>
-  </div>
   }
+
+  <!-- MODAL ADMIN (SOLO PIN) -->
+  @if (isAdminModalOpen()) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title">Admin Access</h2>
+        <input #adminPin type="password" class="table-input" [class.error-shake]="authError()" placeholder="Enter PIN" (keyup.enter)="confirmAdminLogin(adminPin.value)" autofocus>
+
+        @if (authError()) { <p class="error-text">{{ errorMessage() }}</p> }
+
+        <div class="modal-buttons">
+          <button class="access-button confirm-btn" (click)="confirmAdminLogin(adminPin.value)">Enter</button>
+          <button class="access-button cancel-btn" (click)="closeAllModals()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL WORKER (NAME + PIN) -->
+  @if (isWorkerModalOpen()) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title">Staff Login</h2>
+        <input #workerName type="text" class="table-input" [class.error-shake]="authError()" placeholder="Username" style="margin-bottom: 10px;" autofocus>
+        <input #workerPin type="password" class="table-input" [class.error-shake]="authError()" placeholder="PIN" (keyup.enter)="confirmWorkerLogin(workerName.value, workerPin.value)">
+
+        @if (authError()) { <p class="error-text">{{ errorMessage() }}</p> }
+
+        <div class="modal-buttons">
+          <button class="access-button confirm-btn" (click)="confirmWorkerLogin(workerName.value, workerPin.value)">Login</button>
+          <button class="access-button cancel-btn" (click)="closeAllModals()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  }
+
 </div>
