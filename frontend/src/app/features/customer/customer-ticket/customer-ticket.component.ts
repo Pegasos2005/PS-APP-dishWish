@@ -13,20 +13,17 @@ import { CustomerOrderService } from '../../../core/services/customer-order.serv
 })
 export class CustomerTicketComponent implements OnInit {
   private router = inject(Router);
-  private orderService = inject(CustomerOrderService);
+  public orderService = inject(CustomerOrderService); // <--- Público para el HTML
 
   isPaymentRequested = signal<boolean>(false);
-  tableId = 1; // En un futuro, esto vendrá del inicio de sesión/QR del cliente
 
   // Nuestro Signal ahora empieza vacío
   tableOrders = signal<any[]>([]);
 
-  // El total amount sumará correctamente los precios recibidos (Solo una declaración aquí)
   totalAmount = computed(() => {
     let total = 0;
     this.tableOrders().forEach(order => {
       order.items.forEach((item: any) => {
-        // Multiplicamos cantidad por el precio (que viene de BigDecimal)
         total += (item.price * item.quantity);
       });
     });
@@ -38,33 +35,36 @@ export class CustomerTicketComponent implements OnInit {
   }
 
   loadTicketData() {
-    this.orderService.getTicketByTable(this.tableId).subscribe({
-      next: (backendOrders) => {
-        const adaptedOrders = backendOrders.map((order, index) => {
-          const dateObj = order.orderDate ? new Date(order.orderDate) : new Date();
-          const timeString = `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+    // AHORA LEEMOS LA MESA REAL DEL SERVICIO GLOBAL
+    const currentTable = this.orderService.tableId();
 
-          return {
-            commandNumber: index + 1,
-            time: timeString,
-            items: order.items.map((item: any) => ({
-              quantity: item.quantity,
-              // Leemos las variables exactas del DTO: productName y productPrice
-              name: item.productName,
-              price: item.productPrice
-            }))
-          };
-        });
+    if (currentTable) {
+      this.orderService.getTicketByTable(currentTable).subscribe({
+        next: (backendOrders) => {
+          const adaptedOrders = backendOrders.map((order, index) => {
+            const dateObj = order.orderDate ? new Date(order.orderDate) : new Date();
+            const timeString = `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
 
-        this.tableOrders.set(adaptedOrders);
-      },
-      error: (err) => console.error("Error loading ticket:", err)
-    });
+            return {
+              commandNumber: index + 1,
+              time: timeString,
+              items: order.items.map((item: any) => ({
+                quantity: item.quantity,
+                name: item.productName,
+                price: item.productPrice
+              }))
+            };
+          });
+
+          this.tableOrders.set(adaptedOrders);
+        },
+        error: (err) => console.error("Error loading ticket:", err)
+      });
+    }
   }
 
   requestPayment(): void {
     this.isPaymentRequested.set(true);
-    // Próximo paso: this.ticketService.notifyWaiter(this.tableId).subscribe()
   }
 
   cancelPayment(): void {

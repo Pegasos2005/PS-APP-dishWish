@@ -16,7 +16,7 @@
   <div class="ticket-wrapper">
 
     <main class="ticket-paper">
-      <h1 class="table-title">Table: {{ tableId }}</h1>
+      <h1 class="table-title">Table: {{ orderService.tableId() }}</h1>
 
       @for (order of tableOrders(); track order.commandNumber) {
       <div class="command-block">

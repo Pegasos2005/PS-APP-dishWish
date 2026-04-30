@@ -15,8 +15,6 @@ export class ShowOrderComponent {
   public orderService = inject(CustomerOrderService);
   private router = inject(Router);
 
-  public tableId = 1;
-
   increaseQuantity(product: any) {
     this.orderService.addProduct(product);
   }
@@ -46,10 +44,18 @@ export class ShowOrderComponent {
   }
 
   sendOrder() {
+    const currentTable = this.orderService.tableId();
+
     if (this.orderService.order.length === 0) {
       alert("Your cart is empty. Please add some products.");
       return;
     }
+
+    if (!currentTable) {
+      alert("Error: Table not assigned.");
+      return;
+    }
+
     // Preparamos los items con sus extras y quitados
     const itemsPayload = this.orderService.order.map(item => ({
       productId: item.product.id,
@@ -59,7 +65,7 @@ export class ShowOrderComponent {
     }));
 
     const orderPayload = {
-      tableId: this.tableId,
+      tableId: currentTable,
       items: itemsPayload
     };
 
