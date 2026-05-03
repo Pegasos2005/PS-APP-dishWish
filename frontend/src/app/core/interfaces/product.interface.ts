@@ -11,15 +11,14 @@ export interface ProductDTO {
 
 // Interfaz completa para edición
 export interface Product extends ProductDTO {
-  productIngredients: ProductIngredient[];
+  // CAMBIO: Ahora coincide con el nombre de la lista en tu Java DTO (ingredients)
+  ingredients: IngredientDTO[];
 }
 
-export interface ProductIngredient {
+// Nueva estructura que refleja el DTO de Java
+export interface IngredientDTO {
   id: number;
-  isDefault: boolean;
-  ingredient: {
-    id: number;
-    name: string;
-    extraPrice: number;
-  };
+  name: string;
+  extraPrice: number;
+  isDefault: boolean; // Este valor viene mapeado desde la tabla intermedia
 }

@@ -47,26 +47,34 @@ export class ProductFormComponent implements OnInit {
   }
 
   loadProduct(id: number) {
-    this.productService.getProductById(id).subscribe(product => {
-      this.currentProduct = product; // Guardamos el objeto para la imagen
+    this.productService.getProductById(id).subscribe({
+      next: (product) => {
+        // 1. Relleno básico
+        this.productForm.patchValue({
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          picture: product.picture
+        });
 
-      // Rellenar campos básicos
-      this.productForm.patchValue({
-        name: product.name,
-        price: product.price,
-        description: product.description,
-        picture: product.picture
-      });
+        // 2. Relleno de ingredientes
+        const ingredientsArray = this.ingredientsArray;
+        ingredientsArray.clear();
 
-      // Limpiar y rellenar ingredientes
-      this.ingredientsArray.clear();
-      product.productIngredients?.forEach((pi: any) => {
-        this.ingredientsArray.push(this.fb.group({
-          id: [pi.id],
-          isDefault: [pi.isDefault],
-          ingredient: [pi.ingredient]
-        }));
-      });
+        // OJO: Usamos 'product.ingredients' (como se llama en tu DTO de Java)
+        if (product.ingredients && Array.isArray(product.ingredients)) {
+          product.ingredients.forEach((ing: any) => {
+            ingredientsArray.push(this.fb.group({
+              // Mapeamos los campos que definiste en IngredientDTO
+              id: [ing.id],
+              name: [ing.name],
+              extraPrice: [ing.extraPrice],
+              isDefault: [ing.isDefault]
+            }));
+          });
+        }
+      },
+      error: (err) => console.error('Error cargando producto:', err)
     });
   }
 
@@ -92,6 +100,17 @@ export class ProductFormComponent implements OnInit {
               },
               error: (err) => console.error("Error al crear", err)
             });
+    }
+  }
+
+  openIngredientPicker() {
+    // Si estamos editando, pasamos el ID, si no, navegamos sin ID
+    if (this.isEditMode && this.productId) {
+      this.router.navigate(['/admin/product-management/ingredient-picker', this.productId]);
+    } else {
+      // Nota: Si es nuevo producto, aquí podrías guardar el estado
+      // en un servicio temporal si quieres volver con los datos escritos.
+      this.router.navigate(['/admin/product-management/ingredient-picker']);
     }
   }
 

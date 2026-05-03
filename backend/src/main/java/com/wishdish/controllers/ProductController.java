@@ -1,5 +1,6 @@
 package com.wishdish.controllers; // Ajusta el paquete según tu estructura
 
+import com.wishdish.dtos.ProductDTO;
 import com.wishdish.models.Product;
 import com.wishdish.models.ProductIngredient;
 import com.wishdish.repositories.ProductRepository;
@@ -32,9 +33,9 @@ public class ProductController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Integer id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Integer id) {
         return productRepository.findById(id)
-                .map(ResponseEntity::ok)
+                .map(product -> ResponseEntity.ok(new ProductDTO(product))) // AQUÍ ESTÁ LA MAGIA
                 .orElse(ResponseEntity.notFound().build());
     }
 
