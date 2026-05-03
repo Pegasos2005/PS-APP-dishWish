@@ -75,15 +75,23 @@ export class ProductFormComponent implements OnInit {
 
     // Si estamos en modo edición (que lo sabemos porque productId no es null)
     if (this.isEditMode && this.productId) {
+
+      // MODO EDICIÓN
       this.productService.updateProduct(this.productId, this.productForm.value)
         .subscribe({
-          next: () => {
-            console.log("Producto actualizado con éxito");
-            // Redirigir a la lista de productos
-            this.router.navigate(['/admin/products']); // Ajusta esta ruta si tu lista tiene otra
-          },
+          next: () => this.router.navigate(['/admin/products']),
           error: (err) => console.error("Error al actualizar", err)
-        });
+      });
+    } else {
+          // MODO CREACIÓN (Añadir)
+          this.productService.createProduct(this.productForm.value)
+            .subscribe({
+              next: () => {
+                console.log("Producto creado con éxito");
+                this.router.navigate(['/admin/product-management/product-list']);
+              },
+              error: (err) => console.error("Error al crear", err)
+            });
     }
   }
 

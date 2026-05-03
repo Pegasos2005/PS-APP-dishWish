@@ -1,6 +1,5 @@
 package com.wishdish.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ProductIngredient> productIngredients = new ArrayList<>();
 

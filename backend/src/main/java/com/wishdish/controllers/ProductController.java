@@ -64,4 +64,15 @@ public class ProductController {
             return ResponseEntity.ok(updatedProduct);
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        // Vinculamos cada ingrediente al nuevo producto antes de guardar
+        if (product.getProductIngredients() != null) {
+            for (ProductIngredient pi : product.getProductIngredients()) {
+                pi.setProduct(product);
+            }
+        }
+        return ResponseEntity.ok(productRepository.save(product));
+    }
 }

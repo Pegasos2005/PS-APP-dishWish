@@ -1,6 +1,5 @@
 package com.wishdish.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ public class Ingredient {
     // Esta es la parte clave: mapeamos la relación con la tabla intermedia
     // cascade = CascadeType.ALL asegura que si borras el ingrediente, se borren sus relaciones
     // orphanRemoval = true elimina los registros hijos huérfanos de la base de datos
-    @JsonManagedReference
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductIngredient> productIngredients = new ArrayList<>();
 
