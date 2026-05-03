@@ -1,0 +1,30 @@
+<div class="principal-container">
+  <header class="head">
+    <button type="button" class="return-button" routerLink="/admin/ingredient-management/ingredient-list">&lt;</button>
+    <img src="assets/logo.png" alt="Logo">
+  </header>
+
+  <div class="body-admin">
+    <div class="sub-header">
+      Admin - {{ isEditMode ? 'Edit Ingredient' : 'Add Ingredient' }}
+    </div>
+
+    <main class="content-area">
+      <form [formGroup]="ingredientForm" (ngSubmit)="save()" class="comanda-card">
+
+        <div class="product-details">
+          <label class="input-label">Name</label>
+          <input type="text" formControlName="name" placeholder="Ingredient name" class="dish-name-input">
+
+          <div class="price-wrapper">
+            <label>Price:</label>
+            <input type="number" formControlName="extraPrice" placeholder="0.00" class="price-input">
+          </div>
+
+          <button type="submit" class="confirm-btn" [disabled]="ingredientForm.invalid">Confirm</button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+</div>

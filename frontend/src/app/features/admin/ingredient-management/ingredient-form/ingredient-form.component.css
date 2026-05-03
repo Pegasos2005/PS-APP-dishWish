@@ -1,0 +1,77 @@
+/* --- Contenedor Principal --- */
+.principal-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f5f6f9 0%, #eef0f5 100%);
+}
+
+.sub-header { padding: 20px 40px; color: #666; font-weight: 600; }
+
+.content-area {
+  flex: 1;
+  padding: 0 40px 40px 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.comanda-card {
+  background: white;
+  border-radius: 25px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  width: 100%;
+  max-width: 500px; /* Reducido de 850px porque no hay dos columnas */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Inputs y Detalles --- */
+.input-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.dish-name-input {
+  width: 100%;
+  font-size: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.price-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.price-input {
+  width: 100px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+/* --- Botón Confirm --- */
+.confirm-btn {
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+  display: block;
+  width: 100%; /* Ocupa todo el ancho como indicaste */
+}

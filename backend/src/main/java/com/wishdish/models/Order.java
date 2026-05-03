@@ -1,5 +1,6 @@
 package com.wishdish.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,27 +14,24 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // Relación: Muchas comandas pueden ser de una misma mesa
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "table_id", nullable = false)
     private DiningTable diningTable;
 
-    // Fechas en Java moderno. insertable = false hace que MySQL ponga la fecha automáticamente
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
-    // Le decimos a Java que guarde el Enum como Texto (String) en la base de datos
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status = OrderStatus.in_kitchen; // El valor por defecto
+    private OrderStatus status = OrderStatus.in_kitchen;
 
     @Column(name = "general_notes", columnDefinition = "TEXT")
     private String generalNotes;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> items = new ArrayList<>();
 
-    // --- NUESTRO ENUM INTERNO (Las únicas opciones válidas) ---
     public enum OrderStatus {
         in_kitchen,
         served,
@@ -42,10 +40,9 @@ public class Order {
 
     @PrePersist
     protected void onCreate() {
-        this.orderDate = LocalDateTime.now(); // Coge la hora exacta del sistema en ese instante
+        this.orderDate = LocalDateTime.now();
     }
 
-    // --- Constructor, Getters y Setters ---
     public Order() {
     }
 

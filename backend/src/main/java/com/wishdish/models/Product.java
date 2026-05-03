@@ -33,6 +33,10 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<ProductIngredient> productIngredients = new ArrayList<>();
+
     public Product() {
     }
 
@@ -92,12 +96,6 @@ public class Product {
         this.category = category;
     }
 
-    // Se añade la relación para tener la tabla intermedia entre Ingredient y Product
-    @JsonManagedReference
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<ProductIngredient> productIngredients = new ArrayList<>();
-
-    // Getter
     public List<ProductIngredient> getProductIngredients() {
         return productIngredients;
     }

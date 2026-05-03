@@ -3,33 +3,48 @@ import { Routes } from '@angular/router';
 import { adminGuard } from '../../core/guards/admin.guard';
 
 export const ADMIN_ROUTES: Routes = [
-  // Redirigimos la entrada base directamente al dashboard
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
-  // Agrupamos TODAS las rutas del admin bajo el Guard[cite: 36]
   {
     path: '',
-    canActivate: [adminGuard], // <--- EL PORTERO: Solo entra el rol ADMIN
+    canActivate: [adminGuard],
     children: [
       {
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent)
       },
+      // Nueva página intermedia (Hub de gestión)
       {
-        path: 'products',
+        path: 'crud-menu',
+        loadComponent: () => import('./crud-menu/crud-menu.component').then(c => c.CrudMenuComponent)
+      },
+
+      // --- PRODUCT MANAGEMENT ---
+      {
+        path: 'product-management/product-list',
         loadComponent: () => import('./product-management/product-list/product-list.component').then(c => c.ProductListComponent)
       },
       {
-        path: 'products/new',
+        path: 'product-management/product-form',
         loadComponent: () => import('./product-management/product-form/product-form.component').then(c => c.ProductFormComponent)
       },
       {
-        path: 'products/edit/:id',
+        path: 'product-management/product-form/:id',
         loadComponent: () => import('./product-management/product-form/product-form.component').then(c => c.ProductFormComponent)
       },
+
+      // --- INGREDIENT MANAGEMENT ---
       {
-        path: 'ingredients/new',
-        loadComponent: () => import('./product-management/ingredient-form/ingredient-form.component').then(c => c.IngredientFormComponent)
+        path: 'ingredient-management/ingredient-list',
+        loadComponent: () => import('./ingredient-management/ingredient-list/ingredient-list.component').then(c => c.IngredientListComponent)
+      },
+      {
+        path: 'ingredient-management/ingredient-form',
+        loadComponent: () => import('./ingredient-management/ingredient-form/ingredient-form.component').then(c => c.IngredientFormComponent)
+      },
+      {
+        path: 'ingredient-management/ingredient-form/:id',
+        loadComponent: () => import('./ingredient-management/ingredient-form/ingredient-form.component').then(c => c.IngredientFormComponent)
       }
     ]
   }

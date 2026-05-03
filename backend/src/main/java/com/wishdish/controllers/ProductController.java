@@ -1,6 +1,7 @@
 package com.wishdish.controllers; // Ajusta el paquete según tu estructura
 
 import com.wishdish.models.Product;
+import com.wishdish.models.ProductIngredient;
 import com.wishdish.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,17 +40,28 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product productDetails) {
-        return productRepository.findById(id)
-                .map(existingProduct -> {
-                    existingProduct.setName(productDetails.getName());
-                    existingProduct.setPrice(productDetails.getPrice());
-                    existingProduct.setDescription(productDetails.getDescription());
-                    existingProduct.setPicture(productDetails.getPicture());
-                    // Si también editas ingredientes, aquí deberías gestionar la actualización de la lista
+        return productRepository.findById(id).map(existingProduct -> {
+            // 1. Actualizar datos básicos
+            existingProduct.setName(productDetails.getName());
+            existingProduct.setPrice(productDetails.getPrice());
+            existingProduct.setDescription(productDetails.getDescription());
+            existingProduct.setPicture(productDetails.getPicture());
 
-                    Product updatedProduct = productRepository.save(existingProduct);
-                    return ResponseEntity.ok(updatedProduct);
-                })
-                .orElse(ResponseEntity.notFound().build());
+            // 2. CORRECCIÓN: Sincronizar ingredientes
+            if (productDetails.getProductIngredients() != null) {
+                // Limpiamos los ingredientes actuales (esto borra los de la BD gracias a orphanRemoval=true)
+                existingProduct.getProductIngredients().clear();
+
+                // Añadimos los nuevos que vienen en el JSON
+                for (ProductIngredient pi : productDetails.getProductIngredients()) {
+                    pi.setProduct(existingProduct); // CRUCIAL: Vincular el hijo al padre
+                    existingProduct.getProductIngredients().add(pi);
+                }
+            }
+
+            // 3. Guardar cambios
+            Product updatedProduct = productRepository.save(existingProduct);
+            return ResponseEntity.ok(updatedProduct);
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
