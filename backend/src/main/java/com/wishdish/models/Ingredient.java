@@ -1,8 +1,10 @@
 package com.wishdish.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ingredients")
@@ -20,6 +22,16 @@ public class Ingredient {
     @Column(precision = 10, scale = 2)
     private BigDecimal extraPrice = BigDecimal.ZERO;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
+    // Esta es la parte clave: mapeamos la relación con la tabla intermedia
+    // cascade = CascadeType.ALL asegura que si borras el ingrediente, se borren sus relaciones
+    // orphanRemoval = true elimina los registros hijos huérfanos de la base de datos
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<ProductIngredient> productIngredients = new ArrayList<>();
+
     // Constructor vacío
     public Ingredient() {
     }
@@ -33,7 +45,6 @@ public class Ingredient {
     public Integer getId() {
         return id;
     }
-
 
     public void setId(Integer id) {
         this.id = id;
@@ -55,7 +66,27 @@ public class Ingredient {
         this.description = description;
     }
 
-    public BigDecimal getExtraPrice() { return extraPrice; }
+    public BigDecimal getExtraPrice() {
+        return extraPrice;
+    }
 
-    public void setExtraPrice(BigDecimal extraPrice) { this.extraPrice = extraPrice; }
+    public void setExtraPrice(BigDecimal extraPrice) {
+        this.extraPrice = extraPrice;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public List<ProductIngredient> getProductIngredients() {
+        return productIngredients;
+    }
+
+    public void setProductIngredients(List<ProductIngredient> productIngredients) {
+        this.productIngredients = productIngredients;
+    }
 }

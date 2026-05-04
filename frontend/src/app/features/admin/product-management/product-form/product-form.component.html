@@ -21,12 +21,13 @@
               <input type="checkbox" [id]="'ing-' + $index" formControlName="isDefault" class="hidden-check">
               <label [for]="'ing-' + $index" class="custom-circle"></label>
 
-              <span>{{ control.get('ingredient')?.value.name }}</span>
+              <span>{{ control.get('name')?.value ?? 'Sin nombre' }}</span>
             </div>
             }
 
+
             <div class="add-btn-wrapper">
-              <button type="button" class="add-circle-btn">+</button>
+              <button type="button" class="add-circle-btn" (click)="openIngredientPicker()">+</button>
             </div>
           </div>
         </div>

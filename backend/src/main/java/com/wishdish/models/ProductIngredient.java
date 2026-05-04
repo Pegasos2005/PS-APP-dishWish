@@ -1,6 +1,7 @@
 package com.wishdish.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,31 +12,29 @@ public class ProductIngredient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // ManyToOne indica que estos campos representan relaciones entre las tablas
+    @ManyToOne
+    @JoinColumn(name = "product_id")
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredient_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
-    @Column(nullable = false)
-    private Boolean isDefault = true;  // ¿Viene por defecto en el plato?
+    @Column(name = "is_default")
+    private boolean isDefault = true;
 
-    // Constructor vacío
+    // Constructor vacío (Obligatorio para JPA)
     public ProductIngredient() {
     }
 
-    // Constructor con parámetros
-    public ProductIngredient(Product product, Ingredient ingredient, Boolean isDefault) {
+    // --- CORRECCIÓN: Este es el constructor que pedía DataLoader ---
+    public ProductIngredient(Product product, Ingredient ingredient, boolean isDefault) {
         this.product = product;
         this.ingredient = ingredient;
         this.isDefault = isDefault;
     }
 
-    // Getters y Setters
     public Integer getId() {
         return id;
     }
@@ -60,13 +59,29 @@ public class ProductIngredient {
         this.ingredient = ingredient;
     }
 
-    public Boolean getIsDefault() {
+    public boolean isDefault() {
         return isDefault;
     }
 
-    public void setIsDefault(Boolean isDefault) {
+    // --- CORRECCIÓN: Este es el método que pedía ProductDTO ---
+    public boolean getIsDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
     }
 
-}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProductIngredient)) return false;
+        ProductIngredient that = (ProductIngredient) o;
+        return id != null && id.equals(that.getId());
+    }
 
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}

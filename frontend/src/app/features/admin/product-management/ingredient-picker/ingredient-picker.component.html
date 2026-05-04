@@ -1,0 +1,33 @@
+<div class="principal-container">
+  <div class="body-admin">
+    <div class="sub-header">Select Ingredients</div>
+
+    <main class="content-area">
+      <div class="admin-toolbar">
+        <input type="text" class="search-field" placeholder="🔍 Search ingredients..."
+               (input)="searchTerm.set($any($event.target).value)">
+        <button class="add-btn" (click)="confirmSelection()">Confirm</button>
+      </div>
+
+      <div class="grid-comandas">
+        @for (ingredient of filteredIngredients(); track ingredient.id) {
+        <section class="comanda-card">
+          <div class="product-row">
+            <span class="product-name"><strong>{{ ingredient.name }}</strong></span>
+            <div class="product-controls">
+              <span class="product-price">{{ ingredient.extraPrice | number:'1.2-2' }}€</span>
+              <div class="actions">
+                @if (isSelected(ingredient)) {
+                <button class="btn-remove" (click)="toggleIngredient(ingredient)">Remove</button>
+                } @else {
+                <button class="btn-add-action" (click)="toggleIngredient(ingredient)">Add</button>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+        }
+      </div>
+    </main>
+  </div>
+</div>

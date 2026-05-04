@@ -4,8 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-import { Product, ProductDTO } from '../../features/admin/interfaces/product.interface';
-import { Ingredient } from '../../features/admin/interfaces/ingredient.interface';
+import { Product, ProductDTO } from '../../core/interfaces/product.interface';
+import { Ingredient } from '../../core/interfaces/ingredient.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {

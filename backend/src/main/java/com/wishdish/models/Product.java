@@ -1,6 +1,5 @@
 package com.wishdish.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,6 +31,9 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ProductIngredient> productIngredients = new ArrayList<>();
 
     public Product() {
     }
@@ -92,12 +94,6 @@ public class Product {
         this.category = category;
     }
 
-    // Se añade la relación para tener la tabla intermedia entre Ingredient y Product
-    @JsonManagedReference
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<ProductIngredient> productIngredients = new ArrayList<>();
-
-    // Getter
     public List<ProductIngredient> getProductIngredients() {
         return productIngredients;
     }

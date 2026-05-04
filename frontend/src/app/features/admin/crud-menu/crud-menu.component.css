@@ -1,0 +1,21 @@
+/* Reutilizamos los estilos del dashboard para coherencia */
+@import '../dashboard/dashboard.component.css';
+
+.crud-selection-grid {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Hacemos las tarjetas un poco más grandes para este menú específico */
+.crud-selection-grid .action-card {
+  width: 300px;
+  height: 300px;
+}
+
+.crud-selection-grid .card-icon {
+  font-size: 5rem;
+}

@@ -29,7 +29,7 @@ export class DashboardComponent {
   // Los 18 botones (9 reales + 9 ejemplos para la página 2)
   menuItems: AdminMenuItem[] = [
     // Página 1
-    { id: 1, title: 'Edit Product', icon: '🍔', action: 'edit-product' },
+    { id: 1, title: 'Manage Catalog', icon: '🍔', action: 'manage-catalog' },
     { id: 2, title: 'Change User Table', icon: '🔄', action: 'change-table' },
     { id: 3, title: 'Edit Comand', icon: '📝', action: 'edit-comand' },
     { id: 4, title: 'Manage Devices', icon: '📱', action: 'manage-devices' },
@@ -72,8 +72,8 @@ export class DashboardComponent {
   // Lógica de navegación centralizada
   handleItemClick(action: string) {
     switch (action) {
-      case 'edit-product':
-        this.router.navigate(['/admin/products']);
+      case 'manage-catalog':
+        this.router.navigate(['/admin/crud-menu']);
         break;
       default:
         console.log('Acción no implementada todavía:', action);
