@@ -1,7 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Producto } from '../models/producto.model';
 import { OrderItem } from '../interfaces/order-item.interface'; // Fíjate en el nuevo nombre
 import { environment } from '../../../environments/environment';
 
@@ -22,7 +21,7 @@ export class CustomerOrderService {
     if (stored) this.tableId.set(+stored);
   }
 
-  setTableId(id: number) {
+  setTableId(id: number | null) {
     this.tableId.set(id);
     sessionStorage.setItem('tableId', String(id));
   }

@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CustomerOrderService } from '../../../core/services/customer-order.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-join-as',
@@ -14,21 +15,63 @@ import { CustomerOrderService } from '../../../core/services/customer-order.serv
 export class JoinAsComponent {
   private router = inject(Router);
   private orderService = inject(CustomerOrderService);
+  private authService = inject(AuthService);
 
+  // Estados de los modales
   isTableModalOpen = signal<boolean>(false);
+  isAdminModalOpen = signal<boolean>(false); // Modal de Admin (solo password)
+  isWorkerModalOpen = signal<boolean>(false); // Modal de Worker (User + password)
+
   tableError = signal<boolean>(false);
-  errorMessage = signal<string>(''); // <--- NUEVO: Para mensajes de error personalizados
+  authError = signal<boolean>(false);
+  errorMessage = signal<string>('');
 
-  joinAsAdmin(): void { this.router.navigate(['/admin']); }
-  joinAsWorker(): void { this.router.navigate(['/worker']); }
+  // --- BOTONES PRINCIPALES ---
+  joinAsAdmin(): void { this.isAdminModalOpen.set(true); }
+  joinAsWorker(): void { this.isWorkerModalOpen.set(true); }
+  joinAsUser(): void { this.isTableModalOpen.set(true); }
 
-  joinAsUser(): void {
-    this.isTableModalOpen.set(true);
+  closeAllModals(): void {
+    this.isTableModalOpen.set(false);
+    this.isAdminModalOpen.set(false);
+    this.isWorkerModalOpen.set(false);
+    this.tableError.set(false);
+    this.authError.set(false);
   }
 
-  closeModal(): void {
-    this.isTableModalOpen.set(false);
-    this.tableError.set(false);
+  // --- LOGIN ADMIN ---
+  confirmAdminLogin(pin: string): void {
+    this.authService.login(null, pin).subscribe({
+      next: () => {
+        this.closeAllModals();
+        this.router.navigate(['/admin']);
+      },
+      error: () => {
+        this.authError.set(true);
+        this.errorMessage.set('Incorrect password.');
+      }
+    });
+  }
+
+  // --- LOGIN WORKER ---
+  confirmWorkerLogin(username: string, pin: string): void {
+    if(!username || !pin) {
+      this.authError.set(true);
+      this.errorMessage.set('Please fill both fields.');
+      return;
+    }
+
+    this.authService.login(username, pin).subscribe({
+      next: (res) => {
+        this.closeAllModals();
+        // Si el login es correcto, el backend ya habrá comprobado que existe[cite: 43]
+        this.router.navigate(['/worker']);
+      },
+      error: () => {
+        this.authError.set(true);
+        this.errorMessage.set('Incorrect username or password.');
+      }
+    });
   }
 
   confirmTable(inputValue: string): void {

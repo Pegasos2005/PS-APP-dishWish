@@ -28,13 +28,13 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
     @Autowired
     private IngredientRepository ingredientRepository;
 
-    // @Transactional asegura que si falla un plato, no se guarde la comanda a medias
     @Transactional
     public Order createOrder(Integer tableNumber, List<OrderItemRequestDTO> items) {
-        // Busca mesa por su número visual, no por su ID interno
+        // Busca mesa por su número visual
         DiningTable table = diningTableRepository.findByTableNumber(tableNumber)
                 .orElseThrow(() -> new RuntimeException("Error: La mesa número " + tableNumber + " no existe."));
 
@@ -48,53 +48,62 @@ public class OrderService {
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("Error: El producto " + itemRequest.getProductId() + " no existe."));
 
-            OrderItem item = new OrderItem();
-            item.setOrder(savedOrder);
-            item.setProduct(product);
-
-            item.setQuantity(itemRequest.getQuantity());
-            item.setStatus(OrderItem.ItemStatus.in_kitchen);
-
-
-            // Precio base del plato
+            // 1. Calculamos el precio y procesamos los textos UNA sola vez
             BigDecimal precioCalculado = product.getPrice();
-
-            // Traducimos las listas a un texto para la cocina
             StringBuilder notes = new StringBuilder();
+            StringBuilder extrasGuardados = new StringBuilder();
 
-            // si hay extras los sumamos
+            // Procesar extras
             if (itemRequest.getAddedExtras() != null && !itemRequest.getAddedExtras().isEmpty()) {
                 notes.append("Extra: ").append(String.join(", ", itemRequest.getAddedExtras())).append(". ");
 
-                // Buscamos cada ingrediente extra en la base de datos para saber su precio
-                for (String nombreExtra: itemRequest.getAddedExtras()) {
-
+                for (String nombreExtra : itemRequest.getAddedExtras()) {
                     Ingredient ingredient = ingredientRepository.findByName(nombreExtra).orElse(null);
+                    BigDecimal extraPrice = BigDecimal.ZERO;
 
                     if (ingredient != null && ingredient.getExtraPrice() != null) {
-                        precioCalculado = precioCalculado.add(ingredient.getExtraPrice());
+                        extraPrice = ingredient.getExtraPrice();
+                        precioCalculado = precioCalculado.add(extraPrice);
                     }
+
+                    if (extrasGuardados.length() > 0) {
+                        extrasGuardados.append(";");
+                    }
+                    extrasGuardados.append(nombreExtra).append(":").append(extraPrice);
                 }
             }
 
+            // Procesar eliminaciones
+            String removedDefaultsStr = "";
             if (itemRequest.getRemovedDefaults() != null && !itemRequest.getRemovedDefaults().isEmpty()) {
                 notes.append("Sin: ").append(String.join(", ", itemRequest.getRemovedDefaults())).append(".");
+                removedDefaultsStr = String.join(";", itemRequest.getRemovedDefaults());
             }
 
-            // Guardamos el precio total en la linea de la comanda
-            item.setUnitPrice(precioCalculado);
-            // Guardamos el texto en el plato
-            item.setObservations(notes.toString().trim());
+            String finalNotes = notes.toString().trim();
+            String finalAddedExtras = extrasGuardados.toString();
 
-            orderItemRepository.save(item);
+            // 2. MAGIA: Guardamos un item en base de datos por cada unidad pedida
+            for (int i = 0; i < itemRequest.getQuantity(); i++) {
+                OrderItem item = new OrderItem();
+                item.setOrder(savedOrder);
+                item.setProduct(product);
+                item.setQuantity(1); // Ahora forzamos que cada línea sea 1 unidad
+                item.setStatus(OrderItem.ItemStatus.in_kitchen);
+
+                item.setRemovedDefaults(removedDefaultsStr);
+                item.setAddedExtras(finalAddedExtras);
+                item.setUnitPrice(precioCalculado);
+                item.setObservations(finalNotes);
+
+                orderItemRepository.save(item);
+            }
         }
 
-        return orderRepository.findById(savedOrder.getId()).get();
+        return orderRepository.findById(savedOrder.getId()).orElseThrow();
     }
 
     public List<OrderResponseDTO> getActiveOrders() {
-        // CORRECCIÓN: Filtramos para que SOLO devuelva las que están en cocina.
-        // Si incluimos 'served', volverán a aparecer al recargar la vista.
         List<Order> orders = orderRepository.findByStatusIn(Collections.singletonList(Order.OrderStatus.in_kitchen));
 
         return orders.stream()
@@ -110,13 +119,11 @@ public class OrderService {
         item.advanceStatus();
         orderItemRepository.save(item);
 
-        // Comprobamos mágicamente si la comanda entera ha terminado
         checkAndAdvanceOrder(item.getOrder());
 
         return item;
     }
 
-    // Método para forzar el avance de la comanda completa desde el controlador
     @Transactional
     public Order advanceOrderStatus(Integer orderId) {
         Order order = orderRepository.findById(orderId)
@@ -131,22 +138,17 @@ public class OrderService {
                 .allMatch(item -> item.getStatus() == OrderItem.ItemStatus.prepared);
 
         if (allPrepared && order.getStatus() == Order.OrderStatus.in_kitchen) {
-            order.advanceStatus(); // Pasará a 'served' automáticamente
+            order.advanceStatus();
             orderRepository.save(order);
         }
     }
 
-    // Método auxiliar (si no lo tienes ya) para no devolver la entidad Order
     @Transactional(readOnly = true)
     public List<OrderResponseDTO> getActiveOrdersByTable(Integer tableNumber) {
-        // CORRECCIÓN DE ESTADOS: Queremos las que se están cocinando y las servidas.
-        // (En tu código habías puesto "paid" en lugar de "served", lo que hacía que
-        // desaparecieran al cocinarlas).
         List<Order.OrderStatus> activeStatuses = Arrays.asList(Order.OrderStatus.in_kitchen, Order.OrderStatus.served);
 
         List<Order> activeOrders = orderRepository.findByDiningTable_TableNumberAndStatusIn(tableNumber, activeStatuses);
 
-        // Usamos directamente tu constructor del DTO. ¡Mágia de Java 8!
         return activeOrders.stream()
                 .map(OrderResponseDTO::new)
                 .collect(Collectors.toList());

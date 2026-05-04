@@ -1,0 +1,157 @@
+/* --- Estilos unificados (Fuente y Diseño) --- */
+.principal-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f6f9 0%, #eef0f5 100%);
+}
+
+.body-admin {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-header {
+  padding: 20px 40px;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.content-area {
+  flex: 1;
+  padding: 0 40px 40px 40px;
+  overflow-y: auto;
+}
+
+.grid-comandas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.comanda-card {
+  border: none;
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+/* --- Barra de herramientas --- */
+.admin-toolbar {
+  display: flex;
+  gap: 15px;
+  max-width: 900px;
+  margin: 0 auto 20px;
+  width: 100%;
+
+  /* --- ESTO ES LO QUE SOLUCIONA EL PROBLEMA --- */
+  position: sticky; /* Se queda pegado al hacer scroll */
+  top: 0;           /* Se posiciona en el borde superior del contenedor */
+  z-index: 1000;    /* Fuerza a estar por encima de todo */
+  background: #f5f6f9; /* Fondo necesario para que no se vea el texto de abajo al hacer scroll */
+  padding: 10px 0;  /* Un poco de aire para que no esté pegado al borde */
+}
+
+.search-field {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 15px;
+  border: 1px solid #e0e0e0;
+  outline: none;
+}
+
+/* --- Filas de producto --- */
+.product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-name {
+  flex: 1;
+}
+
+.product-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.product-price {
+  width: 80px;
+  text-align: right;
+  color: #000;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* --- Botones --- */
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Botón Add (Verde) */
+.btn-add-action {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  min-width: 80px;
+}
+.btn-add-action:hover { background: #218838; }
+
+/* Botón Remove (Rojo) */
+.btn-remove {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  min-width: 80px;
+}
+.btn-remove:hover { background: #c82333; }
+
+/* --- Botón Confirmar (Acción principal) --- */
+.add-btn {
+  background: #4a90e2; /* Azul moderno */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 15px; /* Ajustado al diseño de los inputs */
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(74, 144, 226, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+}
+
+.add-btn:hover {
+  background: #357abd; /* Un azul más oscuro al pasar el ratón */
+  transform: translateY(-2px); /* Efecto de elevación */
+  box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
+}
+
+.add-btn:active {
+  transform: translateY(0); /* Click firme */
+}

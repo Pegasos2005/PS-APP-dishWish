@@ -44,15 +44,18 @@ export class ShowOrderComponent {
   }
 
   sendOrder() {
+    const currentTable = this.orderService.tableId();
+
     if (this.orderService.order.length === 0) {
       alert("Your cart is empty. Please add some products.");
       return;
     }
-    const tableId = this.orderService.tableId();
-    if (tableId === null) {
+
+    if (currentTable === null) {
       this.router.navigate(['/join-as']);
       return;
     }
+
     // Preparamos los items con sus extras y quitados
     const itemsPayload = this.orderService.order.map(item => ({
       productId: item.product.id,
@@ -62,7 +65,7 @@ export class ShowOrderComponent {
     }));
 
     const orderPayload = {
-      tableId,
+      tableId: currentTable,
       items: itemsPayload
     };
 

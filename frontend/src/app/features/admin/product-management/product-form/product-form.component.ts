@@ -1,0 +1,146 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProductService } from '../../../../core/services/product.service';
+import { IngredientSelectionService } from '../../../../core/services/ingredient-selection.service';
+
+@Component({
+  selector: 'app-product-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './product-form.component.html',
+  styleUrls: ['./product-form.component.css']
+})
+export class ProductFormComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private location = inject(Location);
+  private productService = inject(ProductService);
+  private selectionService = inject(IngredientSelectionService);
+
+  productForm: FormGroup;
+  isEditMode = false;
+  productId: number | null = null;
+
+  constructor() {
+    this.productForm = this.fb.group({
+      name: ['', Validators.required],
+      price: [0, [Validators.required, Validators.min(0)]],
+      description: [''],
+      picture: [''],
+      productIngredients: this.fb.array([])
+    });
+  }
+
+  get ingredientsArray(): FormArray {
+    return this.productForm.get('productIngredients') as FormArray;
+  }
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id && id !== 'null') {
+      this.isEditMode = true;
+      this.productId = Number(id);
+      this.loadProduct(this.productId);
+    }
+
+    if (!id && this.selectionService.hasPendingChanges()) {
+      this.populateIngredients(this.selectionService.getSelection());
+    }
+  }
+
+  loadProduct(id: number) {
+    this.productService.getProductById(id).subscribe({
+      next: (product) => {
+        this.productForm.patchValue({
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          picture: product.picture
+        });
+
+        // PRIORIDAD: Si venimos del picker, usamos lo que hay en el service.
+        // Si no, cargamos lo que viene de la DB.
+        if (this.selectionService.hasPendingChanges()) {
+          this.populateIngredients(this.selectionService.getSelection());
+        } else if (product.ingredients && Array.isArray(product.ingredients)) {
+          this.populateIngredients(product.ingredients);
+        }
+      },
+      error: (err) => console.error('Error cargando producto:', err)
+    });
+  }
+
+  populateIngredients(ingredients: any[]) {
+    const array = this.ingredientsArray;
+    array.clear();
+    ingredients.forEach(ing => {
+      // El ingrediente puede venir como objeto directo o anidado según el origen
+      array.push(this.fb.group({
+        id: [ing.id || ing.ingredient?.id],
+        name: [ing.name],
+        extraPrice: [ing.extraPrice],
+        isDefault: [ing.isDefault !== undefined ? ing.isDefault : true]
+      }));
+    });
+  }
+
+  openIngredientPicker() {
+    this.selectionService.setSelection(this.ingredientsArray.value);
+
+    if (this.isEditMode && this.productId) {
+      this.router.navigate(['/admin/product-management/ingredient-picker', this.productId]);
+    } else {
+      this.router.navigate(['/admin/product-management/ingredient-picker']);
+    }
+  }
+
+  onSubmit() {
+    if (this.productForm.invalid) {
+      alert('Por favor, rellena todos los campos obligatorios.');
+      return;
+    }
+
+    // --- TRANSFORMACIÓN DE DATOS PARA EL BACKEND ---
+    // Esto convierte el array plano del formulario en el objeto {ingredient: {id: X}} que JPA espera
+    const rawValue = this.productForm.value;
+    const formattedIngredients = this.ingredientsArray.value.map((item: any) => ({
+        ingredient: { id: item.id }, // <--- EL BACKEND NECESITA ESTA ESTRUCTURA
+        isDefault: item.isDefault || false
+    }));
+
+    const payload = {
+        ...rawValue,
+        productIngredients: formattedIngredients
+    };
+    // -------------------------------------------------
+
+    this.selectionService.clear();
+
+    if (this.isEditMode && this.productId) {
+      this.productService.updateProduct(this.productId, payload).subscribe({
+      next: () => {
+                 this.selectionService.clear();
+                 this.router.navigate(['/admin/product-management/product-list']);
+        },
+        error: (err) => console.error("Error al actualizar", err)
+      });
+    } else {
+      this.productService.createProduct(payload).subscribe({
+      next: () => {
+                 this.selectionService.clear();
+                 this.router.navigate(['/admin/product-management/product-list']);
+        },
+        error: (err) => console.error("Error al crear", err)
+      });
+    }
+  }
+
+  goBack() {
+    this.selectionService.clear();
+    this.router.navigate(['/admin/product-management/product-list']);
+  }
+}

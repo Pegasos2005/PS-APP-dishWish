@@ -1,0 +1,103 @@
+/* --- Contenedor Principal --- */
+.principal-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f5f6f9 0%, #eef0f5 100%);
+}
+
+.sub-header { padding: 20px 40px; color: #666; font-weight: 600; }
+
+.content-area {
+  flex: 1;
+  padding: 0 40px 40px 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.comanda-card {
+  background: white;
+  border-radius: 25px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  width: 100%;
+  max-width: 850px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+/* --- Preferencias (Checkboxes circulares) --- */
+.preferences-list { display: flex; flex-direction: column; gap: 15px; }
+
+.column-title {
+  margin-bottom: 20px;
+  font-size: 1.6rem; /* Aumentado de 1.2rem a 1.6rem */
+  font-weight: 700;
+  color: #222;       /* Un color un poco más oscuro para más contraste */
+}
+
+.ingredient-row { font-size: 1.1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+
+/* Ocultar el checkbox real */
+.hidden-check { display: none; }
+
+/* El círculo visual */
+.custom-circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: white;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Cuando el checkbox está marcado, el label cambia */
+.hidden-check:checked + .custom-circle {
+  background-color: #ff3b30;
+  border-color: #ff3b30;
+}
+
+/* Botón + Centrado */
+.add-btn-wrapper { display: flex; justify-content: center; margin-top: 15px; }
+
+.add-circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background 0.2s;
+}
+.add-circle-btn:hover { background: #e0e0e0; }
+
+/* --- Inputs y Detalles --- */
+.image-container { width: 100%; height: 250px; margin-bottom: 20px; }
+.product-img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+.image-placeholder { width: 100%; height: 100%; background-color: #d9d9d9; border-radius: 20px; }
+
+.dish-name-input { width: 100%; font-size: 1.5rem; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+.description-text { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; }
+
+.price-wrapper { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.price-input { width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+
+/* --- Botón Confirm --- */
+.confirm-btn {
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+  display: block;
+  width: 100%; /* Si quieres que ocupe todo el ancho o cambiarlo a auto */
+}

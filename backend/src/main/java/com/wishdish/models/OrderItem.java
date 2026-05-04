@@ -1,7 +1,7 @@
 package com.wishdish.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -12,46 +12,51 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // 1. Relación con la Comanda (A qué pedido pertenece esta línea)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
-    // 2. Relación con el Producto (Qué plato han pedido)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // Le damos un valor por defecto de 1 por si a alguien se le olvida poner la cantidad
     @Column(nullable = false)
     private Integer quantity = 1;
 
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderItem.ItemStatus status = OrderItem.ItemStatus.in_kitchen; // El valor por defecto
+    private OrderItem.ItemStatus status = OrderItem.ItemStatus.in_kitchen;
 
-    // Las notas específicas para este plato ("Sin pepinillos", "Poco hecho", etc.)
     @Column(name = "item_notes", columnDefinition = "TEXT")
     private String itemNotes;
 
     @Column(columnDefinition = "TEXT")
     private String observations;
 
-    // Precio base del producto + precio de los extras
     @Column(name = "unit_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal unitPrice = BigDecimal.ZERO;
+
+    @Column(name = "added_extras", columnDefinition = "TEXT")
+    private String addedExtras;
+
+    @Column(name = "removed_defaults", columnDefinition = "TEXT")
+    private String removedDefaults;
+
+    public String getAddedExtras() { return addedExtras; }
+    public void setAddedExtras(String addedExtras) { this.addedExtras = addedExtras; }
+
+    public String getRemovedDefaults() { return removedDefaults; }
+    public void setRemovedDefaults(String removedDefaults) { this.removedDefaults = removedDefaults; }
 
     public String getObservations() { return observations; }
     public void setObservations(String observations) { this.observations = observations; }
 
-    // --- NUESTRO ENUM INTERNO (Las únicas opciones válidas) ---
     public enum ItemStatus {
         in_kitchen,
         prepared
     }
 
-    // --- Constructor vacío obligatorio ---
     public OrderItem() {
     }
 

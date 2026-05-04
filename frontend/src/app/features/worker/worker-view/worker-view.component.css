@@ -1,73 +1,56 @@
-/* src/app/features/worker/worker-view/worker-view.component.css */
-
 .principal-container {
   display: flex;
   flex-direction: column;
   width: 100vw;
+  height: 100vh; /* Aseguramos que ocupe toda la altura */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #f5f6f9 0%, #eef0f5 100%);
-  /* Eliminado overflow: hidden que bloqueaba el scroll */
 }
 
-/* --- Cabecera --- */
-.head {
+.body-camarero {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 40px;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  flex-direction: column;
+  overflow: hidden; /* Evita que el contenedor padre se desplace */
 }
-
-.return-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  cursor: pointer;
-  padding: 5px 15px;
-  border-radius: 8px;
-}
-.return-button:hover { background-color: #f0f0f0; }
 
 /* --- Área de contenido con scroll --- */
 .content-area {
   flex: 1;
   padding: 0 40px 40px 40px;
-  overflow-y: auto; /* Permite el scroll vertical */
-  min-height: 0;    /* Necesario para que el scroll funcione dentro de flex */
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .grid-comandas {
   display: flex;
   flex-direction: column;
-  gap: 35px; /* Espacio entre comandas */
+  gap: 35px;
   align-items: center;
 }
 
-/* --- La Tarjeta de Comanda (La grande gris claro) --- */
-.comanda-card { /* Gris claro de tu dibujo */
+/* --- La Tarjeta de Comanda --- */
+.comanda-card {
   border: 1px solid #b0b0b0;
-  border-radius: 20px; /* Bordes muy redondeados */
+  border-radius: 20px;
   padding: 25px;
   width: 100%;
   max-width: 900px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   transition: opacity 0.5s ease, transform 0.5s ease;
+  background: white;
 }
 
-/* Subtítulo (Employee - ComandsList) */
 .sub-header {
-  padding: 20px 40px; /* Alineado con el estilo de Menu */
-  color: #666; /* Color sacado de tu OrderList */
+  padding: 20px 40px;
+  color: #666;
   font-size: 16px;
   font-weight: 600;
 }
 
 .comanda-header {
   display: flex;
-  justify-content: space-between; /* Texto a la izquierda, botón a la derecha */
+  justify-content: space-between;
   align-items: center;
   font-weight: bold;
   font-size: 1.2rem;
@@ -77,14 +60,12 @@
   border-bottom: 2px solid #b0b0b0;
 }
 
-/* --- Grid de platos (2 columnas como en la foto) --- */
 .dishes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
 }
 
-/* --- La Tarjeta de Plato (La gris oscuro) --- */
 .dish-card {
   background-color: #007bff;
   border-radius: 12px;
@@ -109,7 +90,6 @@
   color: white;
 }
 
-/* --- Botón Check PE-08-03 --- */
 .check-circle {
   width: 30px;
   height: 30px;
@@ -123,7 +103,7 @@
   font-weight: bold;
   font-size: 18px;
   transition: all 0.2s ease;
-  flex-shrink: 0; /* Que no se encoja el botón */
+  flex-shrink: 0;
 }
 
 .check-circle.prepared {
@@ -132,21 +112,6 @@
   color: white;
 }
 
-/* --- Lista de Comentarios --- */
-.comments-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: white;
-}
-
-.comments-list li {
-  margin-bottom: 4px;
-}
-
-/* Estilo del check maestro */
 .master-check {
   background: white;
   border: 2px solid #b0b0b0 !important;
@@ -163,7 +128,6 @@
   opacity: 0.4;
   transform: scale(0.98);
   pointer-events: none;
-  transition: all 0.5s ease;
 }
 
 .comanda-amago-salida {
@@ -171,8 +135,9 @@
   transform: scale(0.9) translateY(-20px);
   pointer-events: none;
 }
+
 .item-modifications {
-  background-color: #fff3cd; /* Amarillo suave */
+  background-color: #fff3cd;
   border-left: 4px solid #ffc107;
   padding: 6px 10px;
   margin-top: 8px;
@@ -183,7 +148,7 @@
 }
 
 .customer-instructions {
-  background-color: #e1f5fe; /* Azul muy clarito */
+  background-color: #e1f5fe;
   border-left: 4px solid #03a9f4;
   padding: 6px 10px;
   margin-top: 5px;
@@ -194,7 +159,7 @@
 }
 
 .dish-name strong {
-  color: #e67e22; /* Color para que la cantidad (2x, 1x) resalte */
+  color: #e67e22;
   margin-right: 5px;
 }
 

@@ -1,17 +1,59 @@
+// src/app/features/admin/admin.routes.ts
 import { Routes } from '@angular/router';
 import { adminGuard } from '../../core/guards/admin.guard';
 
 export const ADMIN_ROUTES: Routes = [
-  // Redirigir la ruta vacía a passwd-admin
-  { path: '', redirectTo: 'passwd-admin', pathMatch: 'full' },
-  {
-    path: 'passwd-admin',
-    loadComponent: () => import('./passwd-admin/passwd-admin.component').then(c => c.PasswdAdminComponent)
-  },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
   {
-    path: 'dashboard',
-    canActivate: [adminGuard], // Si el usuario no se ha logueado como admin, no entra
-    loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent)
+    path: '',
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent)
+      },
+      // Nueva página intermedia (Hub de gestión)
+      {
+        path: 'crud-menu',
+        loadComponent: () => import('./crud-menu/crud-menu.component').then(c => c.CrudMenuComponent)
+      },
+
+      // --- PRODUCT MANAGEMENT ---
+      {
+        path: 'product-management/product-list',
+        loadComponent: () => import('./product-management/product-list/product-list.component').then(c => c.ProductListComponent)
+      },
+      {
+        path: 'product-management/product-form',
+        loadComponent: () => import('./product-management/product-form/product-form.component').then(c => c.ProductFormComponent)
+      },
+      {
+        path: 'product-management/product-form/:id',
+        loadComponent: () => import('./product-management/product-form/product-form.component').then(c => c.ProductFormComponent)
+      },
+
+      // --- INGREDIENT MANAGEMENT ---
+      {
+        path: 'ingredient-management/ingredient-list',
+        loadComponent: () => import('./ingredient-management/ingredient-list/ingredient-list.component').then(c => c.IngredientListComponent)
+      },
+      {
+        path: 'ingredient-management/ingredient-form',
+        loadComponent: () => import('./ingredient-management/ingredient-form/ingredient-form.component').then(c => c.IngredientFormComponent)
+      },
+      {
+        path: 'ingredient-management/ingredient-form/:id',
+        loadComponent: () => import('./ingredient-management/ingredient-form/ingredient-form.component').then(c => c.IngredientFormComponent)
+      },
+      {
+         path: 'product-management/ingredient-picker', // Definimos la ruta
+         loadComponent: () => import('./product-management/ingredient-picker/ingredient-picker.component').then(c => c.IngredientPickerComponent)
+       },
+       {
+         path: 'product-management/ingredient-picker/:id',
+         loadComponent: () => import('./product-management/ingredient-picker/ingredient-picker.component').then(c => c.IngredientPickerComponent)
+       }
+    ]
   }
 ];

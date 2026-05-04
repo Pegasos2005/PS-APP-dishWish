@@ -1,0 +1,45 @@
+<div class="principal-container">
+  <header class="head">
+    <button class="return-button" routerLink="/admin/crud-menu">&lt;</button>
+    <img src="assets/logo.png" alt="logo">
+  </header>
+
+  <div class="body-admin">
+    <div class="sub-header">Admin - Ingredient Management</div>
+
+    <main class="content-area">
+      <div class="admin-toolbar">
+        <input
+          type="text"
+          class="search-field"
+          placeholder="🔍 Search ingredients..."
+          (input)="searchTerm.set($any($event.target).value)"
+        >
+        <button class="add-btn" (click)="addNewIngredient()">+ Add Ingredient</button>
+      </div>
+
+      <div class="grid-comandas">
+        @for (ingredient of filteredIngredients(); track ingredient.id) {
+        <section class="comanda-card">
+          <div class="product-row">
+            <span class="product-name"><strong>{{ ingredient.name }}</strong></span>
+
+            <div class="product-controls">
+              <span class="product-price">{{ ingredient.extraPrice | number:'1.2-2' }}€</span>
+
+              <div class="actions">
+                <button class="btn-modify" (click)="editIngredient(ingredient)">Modify</button>
+                <button class="btn-delete" (click)="deleteIngredient(ingredient)">Delete</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        } @empty {
+        <div class="empty-state">
+          <p>No ingredients found in the database.</p>
+        </div>
+        }
+      </div>
+    </main>
+  </div>
+</div>

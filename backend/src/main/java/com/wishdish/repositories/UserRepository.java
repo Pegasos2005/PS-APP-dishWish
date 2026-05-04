@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    // Te dejo preparado este método porque lo necesitaremos para el Login
     Optional<User> findByName(String name);
+    Optional<User> findFirstByRole(User.Role role);
 }

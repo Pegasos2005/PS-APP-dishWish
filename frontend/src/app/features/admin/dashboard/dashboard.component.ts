@@ -7,7 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 interface AdminMenuItem {
   id: number;
   title: string;
-  icon: string; // Usaremos emojis como iconos temporales para que se vea vistoso sin instalar librerías
+  icon: string;
   action: string;
 }
 
@@ -29,7 +29,7 @@ export class DashboardComponent {
   // Los 18 botones (9 reales + 9 ejemplos para la página 2)
   menuItems: AdminMenuItem[] = [
     // Página 1
-    { id: 1, title: 'Edit Product', icon: '🍔', action: 'edit-product' },
+    { id: 1, title: 'Manage Catalog', icon: '🍔', action: 'manage-catalog' },
     { id: 2, title: 'Change User Table', icon: '🔄', action: 'change-table' },
     { id: 3, title: 'Edit Comand', icon: '📝', action: 'edit-comand' },
     { id: 4, title: 'Manage Devices', icon: '📱', action: 'manage-devices' },
@@ -38,7 +38,7 @@ export class DashboardComponent {
     { id: 7, title: 'Stats & Analytics', icon: '📊', action: 'stats' },
     { id: 8, title: 'Inventory', icon: '📦', action: 'inventory' },
     { id: 9, title: 'Settings', icon: '⚙️', action: 'settings' },
-    // Página 2 (Simulada para que funcione la flecha)
+    // Página 2
     { id: 10, title: 'Staff Management', icon: '👥', action: 'staff' },
     { id: 11, title: 'Providers', icon: '🚚', action: 'providers' },
     { id: 12, title: 'Discount Codes', icon: '🎟️', action: 'discounts' },
@@ -50,7 +50,7 @@ export class DashboardComponent {
     { id: 18, title: 'System Logs', icon: '📋', action: 'logs' }
   ];
 
-  // Signal Computado: Calcula automáticamente qué botones mostrar según la página
+  // Signal Computado
   visibleItems = computed(() => {
     const start = this.currentPage() * this.itemsPerPage;
     return this.menuItems.slice(start, start + this.itemsPerPage);
@@ -69,14 +69,21 @@ export class DashboardComponent {
     }
   }
 
+  // Lógica de navegación centralizada
   handleItemClick(action: string) {
-    console.log('Navegando a la acción:', action);
-    // Aquí pondrías el switch o la navegación: this.router.navigate([`/admin/${action}`]);
+    switch (action) {
+      case 'manage-catalog':
+        this.router.navigate(['/admin/crud-menu']);
+        break;
+      default:
+        console.log('Acción no implementada todavía:', action);
+        break;
+    }
   }
 
-  // ¡MUY IMPORTANTE! Al salir, debemos borrar la sesión del guard
+  // Logout
   logout() {
-    this.authService.logoutAdmin(); // Borra el estado de autenticación
-    this.router.navigate(['/join-as']); // Vuelve a la pantalla principal
+    this.authService.logout();
+    this.router.navigate(['/join-as']);
   }
 }

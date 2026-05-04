@@ -1,0 +1,23 @@
+<div class="dashboard-layout">
+  <header class="dashboard-header">
+    <button class="back-btn" (click)="goBack()">❮ Back</button>
+    <h1 class="dashboard-title">Catalog Management</h1>
+    <div style="width: 120px;"></div>
+  </header>
+
+  <main class="main-content">
+    <div class="crud-selection-grid">
+
+      <button class="action-card" (click)="navigateTo('products')">
+        <div class="card-icon">🍔</div>
+        <span class="card-title">Edit Products</span>
+      </button>
+
+      <button class="action-card" (click)="navigateTo('ingredients')">
+        <div class="card-icon">🌿</div>
+        <span class="card-title">Edit Ingredients</span>
+      </button>
+
+    </div>
+  </main>
+</div>

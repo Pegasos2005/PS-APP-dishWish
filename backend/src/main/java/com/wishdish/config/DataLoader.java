@@ -1,16 +1,15 @@
 package com.wishdish.config;
 
 import com.wishdish.models.*;
-import com.wishdish.repositories.CategoryRepository;
-import com.wishdish.repositories.DiningTableRepository;
-import com.wishdish.repositories.IngredientRepository;
-import com.wishdish.repositories.ProductRepository;
-import com.wishdish.repositories.ProductIngredientRepository;
+import com.wishdish.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 @Configuration
 public class DataLoader {
@@ -21,10 +20,26 @@ public class DataLoader {
             ProductRepository productRepository,
             DiningTableRepository diningTableRepository,
             IngredientRepository ingredientRepository,
-            ProductIngredientRepository productIngredientRepository) {
+            ProductIngredientRepository productIngredientRepository,
+            UserRepository userRepository) {
 
         return args -> {
             System.out.println("🔄 Verificando datos en la base de datos...");
+
+            // ===========================
+            // CREAR USUARIOS (STAFF)
+            // ===========================
+            if (userRepository.count() == 0) {
+                System.out.println("   👥 Creando usuarios del sistema...");
+                crearUsuario(userRepository, "Tomas", User.Role.ADMIN, "admin");
+                crearUsuario(userRepository, "Sol", User.Role.KITCHEN, "kitchen");
+                crearUsuario(userRepository, "Carlos", User.Role.KITCHEN, "carlos");
+                crearUsuario(userRepository, "Crisa", User.Role.WAITER, "waiter");
+                System.out.println("   ✓ 4 usuarios creados con contraseñas encriptadas");
+            } else {
+                System.out.println("   ✅ Usuarios ya existen (" + userRepository.count() + " usuarios)");
+            }
+
 
             // ===========================
             // CREAR MESAS (verificación independiente)
@@ -46,7 +61,7 @@ public class DataLoader {
             // ===========================
             if (categoryRepository.count() > 0) {
                 System.out.println("   ✅ Categorías y productos ya existen. Omitiendo carga de productos.");
-                imprimirResumen(categoryRepository, productRepository, diningTableRepository);
+                imprimirResumen(categoryRepository, productRepository, diningTableRepository, userRepository);
                 return;
             }
 
@@ -264,8 +279,28 @@ public class DataLoader {
             System.out.println("   ✓ Todos los ingredientes conectados");
 
 
-            imprimirResumen(categoryRepository, productRepository, diningTableRepository);
+            imprimirResumen(categoryRepository, productRepository, diningTableRepository, userRepository);
         };
+    }
+
+    // --- NUEVO: Métod para crear usuarios con contraseñas encriptadas ---
+    private void crearUsuario(UserRepository repo, String name, User.Role role, String rawPassword) {
+        User user = new User();
+        user.setName(name);
+        user.setRole(role);
+        user.setPinHash(hashPassword(rawPassword)); // Encriptamos antes de guardar
+        repo.save(user);
+    }
+
+    // --- NUEVO: Métod de encriptación SHA-256 ---
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al encriptar la contraseña", e);
+        }
     }
 
     // Método auxiliar para no repetir código creando productos
@@ -292,9 +327,10 @@ public class DataLoader {
     }
 
     // Método auxiliar para el resumen final
-    private void imprimirResumen(CategoryRepository catRepo, ProductRepository prodRepo, DiningTableRepository mesaRepo) {
+    private void imprimirResumen(CategoryRepository catRepo, ProductRepository prodRepo, DiningTableRepository mesaRepo, UserRepository userRepo) {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("✅ Base de datos inicializada correctamente");
+        System.out.println("   👥 Usuarios: " + userRepo.count());
         System.out.println("   📁 Categorías: " + catRepo.count());
         System.out.println("   🍔 Productos: " + prodRepo.count());
         System.out.println("   🪑 Mesas: " + mesaRepo.count());
