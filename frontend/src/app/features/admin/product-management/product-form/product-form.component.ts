@@ -45,8 +45,8 @@ export class ProductFormComponent implements OnInit {
       this.isEditMode = true;
       this.productId = Number(id);
       this.loadProduct(this.productId);
-    } 
-    
+    }
+
     if (!id && this.selectionService.hasPendingChanges()) {
       this.populateIngredients(this.selectionService.getSelection());
     }
@@ -80,7 +80,7 @@ export class ProductFormComponent implements OnInit {
     ingredients.forEach(ing => {
       // El ingrediente puede venir como objeto directo o anidado según el origen
       array.push(this.fb.group({
-        id: [ing.id || ing.ingredient?.id], 
+        id: [ing.id || ing.ingredient?.id],
         name: [ing.name],
         extraPrice: [ing.extraPrice],
         isDefault: [ing.isDefault !== undefined ? ing.isDefault : true]
@@ -99,7 +99,10 @@ export class ProductFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.productForm.invalid) return;
+    if (this.productForm.invalid) {
+      alert('Por favor, rellena todos los campos obligatorios.');
+      return;
+    }
 
     // --- TRANSFORMACIÓN DE DATOS PARA EL BACKEND ---
     // Esto convierte el array plano del formulario en el objeto {ingredient: {id: X}} que JPA espera
@@ -119,12 +122,18 @@ export class ProductFormComponent implements OnInit {
 
     if (this.isEditMode && this.productId) {
       this.productService.updateProduct(this.productId, payload).subscribe({
-        next: () => this.router.navigate(['/admin/product-management/product-list']),
+      next: () => {
+                 this.selectionService.clear();
+                 this.router.navigate(['/admin/product-management/product-list']);
+        },
         error: (err) => console.error("Error al actualizar", err)
       });
     } else {
       this.productService.createProduct(payload).subscribe({
-        next: () => this.router.navigate(['/admin/product-management/product-list']),
+      next: () => {
+                 this.selectionService.clear();
+                 this.router.navigate(['/admin/product-management/product-list']);
+        },
         error: (err) => console.error("Error al crear", err)
       });
     }
