@@ -70,48 +70,37 @@ public class ProductController {
 
             // 2. Gestión de Ingredientes
             if (productDetails.getProductIngredients() != null) {
-                // Mapear los ProductIngredient existentes por su ID de Ingrediente para una búsqueda eficiente
-                Map<Integer, ProductIngredient> existingPisMap = existingProduct.getProductIngredients().stream()
-                        .collect(Collectors.toMap(pi -> pi.getIngredient().getId(), Function.identity()));
+                // Identificar los IDs de ingredientes que vienen en la petición
+                Set<Integer> incomingIds = productDetails.getProductIngredients().stream()
+                        .filter(pi -> pi.getIngredient() != null && pi.getIngredient().getId() != null)
+                        .map(pi -> pi.getIngredient().getId())
+                        .collect(Collectors.toSet());
 
-                // Crear una lista temporal para los ProductIngredient que deben permanecer o ser añadidos/actualizados
-                // Esto nos permite manipular la colección sin modificarla directamente durante la iteración
-                Set<ProductIngredient> pisToKeepOrAdd = new java.util.HashSet<>();
+                // Eliminar de la colección actual los que NO están en la nueva lista
+                existingProduct.getProductIngredients().removeIf(pi ->
+                        !incomingIds.contains(pi.getIngredient().getId()));
 
                 for (ProductIngredient piRequest : productDetails.getProductIngredients()) {
                     if (piRequest.getIngredient() != null && piRequest.getIngredient().getId() != null) {
                         Integer ingredientId = piRequest.getIngredient().getId();
-                        ProductIngredient existingPi = existingPisMap.get(ingredientId);
+
+                        // Buscar si ya existe en la lista que nos quedó
+                        ProductIngredient existingPi = existingProduct.getProductIngredients().stream()
+                                .filter(pi -> pi.getIngredient().getId().equals(ingredientId))
+                                .findFirst().orElse(null);
 
                         if (existingPi != null) {
-                            // El ingrediente ya existe, actualizamos sus propiedades (ej. isDefault)
                             existingPi.setDefault(piRequest.isDefault());
-                            pisToKeepOrAdd.add(existingPi);
-                            // Lo removemos del mapa para que los restantes sean los que hay que eliminar
-                            existingPisMap.remove(ingredientId);
                         } else {
-                            // Es un nuevo ingrediente a añadir
                             Ingredient ingredient = ingredientRepository.findById(ingredientId)
                                     .orElseThrow(() -> new RuntimeException("Ingrediente con ID " + ingredientId + " no encontrado"));
-
-                            ProductIngredient newPi = new ProductIngredient();
-                            newPi.setProduct(existingProduct); // Asegurar el enlace bidireccional
-                            newPi.setIngredient(ingredient);
-                            newPi.setDefault(piRequest.isDefault());
-                            pisToKeepOrAdd.add(newPi);
+                            existingProduct.getProductIngredients().add(new ProductIngredient(existingProduct, ingredient, piRequest.isDefault()));
                         }
                     }
                 }
-
-                // Reemplazamos el contenido de la lista original directamente. 
-                // JPA/Hibernate gestionará el orphanRemoval basándose en los elementos que ya no estén.
-                existingProduct.getProductIngredients().clear();
-                existingProduct.getProductIngredients().addAll(pisToKeepOrAdd);
-
             } else {
-                // Si productDetails.getProductIngredients() es null, se interpretará que se quieren eliminar todos los ingredientes existentes.
                 existingProduct.getProductIngredients().clear();
-                }
+            }
 
             // 3. Guardamos y devolvemos DTO para evitar recursión
             return ResponseEntity.ok(new ProductDTO(productRepository.save(existingProduct)));
