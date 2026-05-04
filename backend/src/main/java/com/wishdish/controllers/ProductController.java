@@ -1,79 +1,132 @@
-package com.wishdish.controllers; // Ajusta el paquete según tu estructura
+package com.wishdish.controllers;
 
 import com.wishdish.dtos.ProductDTO;
 import com.wishdish.models.Product;
 import com.wishdish.models.ProductIngredient;
+import com.wishdish.models.Ingredient;
+import com.wishdish.repositories.IngredientRepository;
 import com.wishdish.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/products") // Esta es la URL exacta que tu Angular está llamando
-@CrossOrigin(origins = "http://localhost:4200") // Permite que Angular (4200) hable con Spring (8080)
+@RequestMapping("/api/products")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private IngredientRepository ingredientRepository;
+
+    // Obtener todos
     @GetMapping
-    public List<Product> getAllProducts() {
-        // Devuelve la lista completa de productos
-        return productRepository.findAll();
+    public List<ProductDTO> getAllProducts() {
+        return productRepository.findAll().stream()
+                .map(ProductDTO::new)
+                .collect(Collectors.toList());
     }
 
-    // Opcional: Si luego quieres filtrar por categoría, ya tienes el repo listo para esto:
-    @GetMapping("/category/{categoryId}")
-    public List<Product> getProductsByCategory(@PathVariable Integer categoryId) {
-        return productRepository.findByCategoryId(categoryId);
-    }
-
-
+    // Obtener por ID
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Integer id) {
         return productRepository.findById(id)
-                .map(product -> ResponseEntity.ok(new ProductDTO(product))) // AQUÍ ESTÁ LA MAGIA
+                .map(product -> ResponseEntity.ok(new ProductDTO(product)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Crear Producto
+    @PostMapping
+    @Transactional
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody Product product) {
+        if (product.getProductIngredients() != null) {
+            for (ProductIngredient pi : product.getProductIngredients()) {
+                pi.setProduct(product);
+            }
+        }
+        return ResponseEntity.ok(new ProductDTO(productRepository.save(product)));
+    }
+
+    // Actualizar Producto - Implementación Robusta
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product productDetails) {
+    @Transactional
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer id, @RequestBody Product productDetails) {
         return productRepository.findById(id).map(existingProduct -> {
+
             // 1. Actualizar datos básicos
             existingProduct.setName(productDetails.getName());
             existingProduct.setPrice(productDetails.getPrice());
             existingProduct.setDescription(productDetails.getDescription());
             existingProduct.setPicture(productDetails.getPicture());
 
-            // 2. CORRECCIÓN: Sincronizar ingredientes
+            // 2. Gestión de Ingredientes
             if (productDetails.getProductIngredients() != null) {
-                // Limpiamos los ingredientes actuales (esto borra los de la BD gracias a orphanRemoval=true)
-                existingProduct.getProductIngredients().clear();
+                // Mapear los ProductIngredient existentes por su ID de Ingrediente para una búsqueda eficiente
+                Map<Integer, ProductIngredient> existingPisMap = existingProduct.getProductIngredients().stream()
+                        .collect(Collectors.toMap(pi -> pi.getIngredient().getId(), Function.identity()));
 
-                // Añadimos los nuevos que vienen en el JSON
-                for (ProductIngredient pi : productDetails.getProductIngredients()) {
-                    pi.setProduct(existingProduct); // CRUCIAL: Vincular el hijo al padre
-                    existingProduct.getProductIngredients().add(pi);
+                // Crear una lista temporal para los ProductIngredient que deben permanecer o ser añadidos/actualizados
+                // Esto nos permite manipular la colección sin modificarla directamente durante la iteración
+                Set<ProductIngredient> pisToKeepOrAdd = new java.util.HashSet<>();
+
+                for (ProductIngredient piRequest : productDetails.getProductIngredients()) {
+                    if (piRequest.getIngredient() != null && piRequest.getIngredient().getId() != null) {
+                        Integer ingredientId = piRequest.getIngredient().getId();
+                        ProductIngredient existingPi = existingPisMap.get(ingredientId);
+
+                        if (existingPi != null) {
+                            // El ingrediente ya existe, actualizamos sus propiedades (ej. isDefault)
+                            existingPi.setDefault(piRequest.isDefault());
+                            pisToKeepOrAdd.add(existingPi);
+                            // Lo removemos del mapa para que los restantes sean los que hay que eliminar
+                            existingPisMap.remove(ingredientId);
+                        } else {
+                            // Es un nuevo ingrediente a añadir
+                            Ingredient ingredient = ingredientRepository.findById(ingredientId)
+                                    .orElseThrow(() -> new RuntimeException("Ingrediente con ID " + ingredientId + " no encontrado"));
+
+                            ProductIngredient newPi = new ProductIngredient();
+                            newPi.setProduct(existingProduct); // Asegurar el enlace bidireccional
+                            newPi.setIngredient(ingredient);
+                            newPi.setDefault(piRequest.isDefault());
+                            pisToKeepOrAdd.add(newPi);
+                        }
+                    }
                 }
-            }
 
-            // 3. Guardar cambios
-            Product updatedProduct = productRepository.save(existingProduct);
-            return ResponseEntity.ok(updatedProduct);
+                // Reemplazamos el contenido de la lista original directamente. 
+                // JPA/Hibernate gestionará el orphanRemoval basándose en los elementos que ya no estén.
+                existingProduct.getProductIngredients().clear();
+                existingProduct.getProductIngredients().addAll(pisToKeepOrAdd);
+
+            } else {
+                // Si productDetails.getProductIngredients() es null, se interpretará que se quieren eliminar todos los ingredientes existentes.
+                existingProduct.getProductIngredients().clear();
+                }
+
+            // 3. Guardamos y devolvemos DTO para evitar recursión
+            return ResponseEntity.ok(new ProductDTO(productRepository.save(existingProduct)));
+
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        // Vinculamos cada ingrediente al nuevo producto antes de guardar
-        if (product.getProductIngredients() != null) {
-            for (ProductIngredient pi : product.getProductIngredients()) {
-                pi.setProduct(product);
-            }
+    // Borrar Producto
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
+        if (!productRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(productRepository.save(product));
+        productRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

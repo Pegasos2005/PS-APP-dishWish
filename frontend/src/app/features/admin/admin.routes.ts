@@ -51,7 +51,7 @@ export const ADMIN_ROUTES: Routes = [
          loadComponent: () => import('./product-management/ingredient-picker/ingredient-picker.component').then(c => c.IngredientPickerComponent)
        },
        {
-         path: 'product-management/ingredient-picker/:productId',
+         path: 'product-management/ingredient-picker/:id',
          loadComponent: () => import('./product-management/ingredient-picker/ingredient-picker.component').then(c => c.IngredientPickerComponent)
        }
     ]

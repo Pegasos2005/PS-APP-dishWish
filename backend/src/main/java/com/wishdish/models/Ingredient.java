@@ -1,5 +1,6 @@
 package com.wishdish.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class Ingredient {
     // cascade = CascadeType.ALL asegura que si borras el ingrediente, se borren sus relaciones
     // orphanRemoval = true elimina los registros hijos huérfanos de la base de datos
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<ProductIngredient> productIngredients = new ArrayList<>();
 
     // Constructor vacío

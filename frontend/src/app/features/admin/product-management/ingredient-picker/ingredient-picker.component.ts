@@ -1,7 +1,9 @@
-import { Component, OnInit, inject, signal, computed, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router'; // <--- IMPORTANTE: Importar estos
 import { Ingredient } from '../../../../core/interfaces/ingredient.interface';
 import { IngredientService } from '../../../../core/services/ingredient.service';
+import { IngredientSelectionService } from '../../../../core/services/ingredient-selection.service';
 
 @Component({
   selector: 'app-ingredient-picker',
@@ -11,27 +13,24 @@ import { IngredientService } from '../../../../core/services/ingredient.service'
   styleUrls: ['./ingredient-picker.component.css']
 })
 export class IngredientPickerComponent implements OnInit {
+  // Inyecciones
   private ingredientService = inject(IngredientService);
+  private selectionService = inject(IngredientSelectionService);
+  private location = inject(Location);
+  private route = inject(ActivatedRoute); // <--- Inyectar
+  private router = inject(Router);        // <--- Inyectar
 
-  // Lista total de ingredientes disponibles
   allIngredients = signal<Ingredient[]>([]);
-
-  // Lista de ingredientes actualmente seleccionados (vendría de un Input)
-  @Input() selectedIngredients: Ingredient[] = [];
-
+  currentSelection = signal<Ingredient[]>([]);
   searchTerm = signal('');
 
-  // Filtramos la lista total
+  // Añadimos esta variable para guardar el ID
+  productId: string | null = null;
+
   filteredIngredients = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    return this.allIngredients().filter(ingredient =>
-      ingredient.name.toLowerCase().includes(term)
-    );
+    return this.allIngredients().filter(ing => ing.name.toLowerCase().includes(term));
   });
-
-  ngOnInit() {
-    this.loadAllIngredients();
-  }
 
   loadAllIngredients() {
     this.ingredientService.getIngredients().subscribe({
@@ -40,17 +39,37 @@ export class IngredientPickerComponent implements OnInit {
     });
   }
 
-  // Comprueba si está en preferencias
   isSelected(ingredient: Ingredient): boolean {
-    return this.selectedIngredients.some(i => i.id === ingredient.id);
+    return this.currentSelection().some(i => i.id === ingredient.id);
   }
 
-  // Alterna selección
   toggleIngredient(ingredient: Ingredient) {
     if (this.isSelected(ingredient)) {
-      this.selectedIngredients = this.selectedIngredients.filter(i => i.id !== ingredient.id);
+      this.currentSelection.update(list => list.filter(i => i.id !== ingredient.id));
     } else {
-      this.selectedIngredients = [...this.selectedIngredients, ingredient];
+      this.currentSelection.update(list => [...list, ingredient]);
+    }
+  }
+
+  ngOnInit() {
+    // Intentamos capturar el ID del snapshot actual o del padre (por si es ruta hija)
+    this.productId = this.route.snapshot.paramMap.get('id') || 
+                     this.route.parent?.snapshot.paramMap.get('id') || null;
+    
+    this.currentSelection.set(this.selectionService.getSelection());
+    this.loadAllIngredients();
+  }
+
+  confirmSelection() {
+    this.selectionService.setSelection(this.currentSelection());
+
+    // Navegación explícita
+    if (this.productId) {
+      // Ajusta esta ruta a la que realmente usas para editar (ej: /admin/product-management/edit/...)
+      this.router.navigate(['/admin/product-management/product-form', this.productId]);
+    } else {
+      // Si no hay ID, volvemos al formulario de creación normal
+      this.router.navigate(['/admin/product-management/product-form']);
     }
   }
 }

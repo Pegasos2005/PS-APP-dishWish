@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
+import { IngredientSelectionService } from '../../../../core/services/ingredient-selection.service';
 
 @Component({
   selector: 'app-product-form',
@@ -17,11 +18,11 @@ export class ProductFormComponent implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
   private productService = inject(ProductService);
+  private selectionService = inject(IngredientSelectionService);
 
   productForm: FormGroup;
   isEditMode = false;
   productId: number | null = null;
-  currentProduct: any = null; // Para guardar el producto y mostrar su imagen
 
   constructor() {
     this.productForm = this.fb.group({
@@ -29,7 +30,7 @@ export class ProductFormComponent implements OnInit {
       price: [0, [Validators.required, Validators.min(0)]],
       description: [''],
       picture: [''],
-      productIngredients: this.fb.array([]) // Array para ingredientes
+      productIngredients: this.fb.array([])
     });
   }
 
@@ -39,17 +40,21 @@ export class ProductFormComponent implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+
+    if (id && id !== 'null') {
       this.isEditMode = true;
       this.productId = Number(id);
       this.loadProduct(this.productId);
+    } 
+    
+    if (!id && this.selectionService.hasPendingChanges()) {
+      this.populateIngredients(this.selectionService.getSelection());
     }
   }
 
   loadProduct(id: number) {
     this.productService.getProductById(id).subscribe({
       next: (product) => {
-        // 1. Relleno básico
         this.productForm.patchValue({
           name: product.name,
           description: product.description,
@@ -57,62 +62,76 @@ export class ProductFormComponent implements OnInit {
           picture: product.picture
         });
 
-        // 2. Relleno de ingredientes
-        const ingredientsArray = this.ingredientsArray;
-        ingredientsArray.clear();
-
-        // OJO: Usamos 'product.ingredients' (como se llama en tu DTO de Java)
-        if (product.ingredients && Array.isArray(product.ingredients)) {
-          product.ingredients.forEach((ing: any) => {
-            ingredientsArray.push(this.fb.group({
-              // Mapeamos los campos que definiste en IngredientDTO
-              id: [ing.id],
-              name: [ing.name],
-              extraPrice: [ing.extraPrice],
-              isDefault: [ing.isDefault]
-            }));
-          });
+        // PRIORIDAD: Si venimos del picker, usamos lo que hay en el service.
+        // Si no, cargamos lo que viene de la DB.
+        if (this.selectionService.hasPendingChanges()) {
+          this.populateIngredients(this.selectionService.getSelection());
+        } else if (product.ingredients && Array.isArray(product.ingredients)) {
+          this.populateIngredients(product.ingredients);
         }
       },
       error: (err) => console.error('Error cargando producto:', err)
     });
   }
 
-  onSubmit() {
-    if (this.productForm.invalid) return;
-
-    // Si estamos en modo edición (que lo sabemos porque productId no es null)
-    if (this.isEditMode && this.productId) {
-
-      // MODO EDICIÓN
-      this.productService.updateProduct(this.productId, this.productForm.value)
-        .subscribe({
-          next: () => this.router.navigate(['/admin/products']),
-          error: (err) => console.error("Error al actualizar", err)
-      });
-    } else {
-          // MODO CREACIÓN (Añadir)
-          this.productService.createProduct(this.productForm.value)
-            .subscribe({
-              next: () => {
-                console.log("Producto creado con éxito");
-                this.router.navigate(['/admin/product-management/product-list']);
-              },
-              error: (err) => console.error("Error al crear", err)
-            });
-    }
+  populateIngredients(ingredients: any[]) {
+    const array = this.ingredientsArray;
+    array.clear();
+    ingredients.forEach(ing => {
+      // El ingrediente puede venir como objeto directo o anidado según el origen
+      array.push(this.fb.group({
+        id: [ing.id || ing.ingredient?.id], 
+        name: [ing.name],
+        extraPrice: [ing.extraPrice],
+        isDefault: [ing.isDefault !== undefined ? ing.isDefault : true]
+      }));
+    });
   }
 
   openIngredientPicker() {
-    // Si estamos editando, pasamos el ID, si no, navegamos sin ID
+    this.selectionService.setSelection(this.ingredientsArray.value);
+
     if (this.isEditMode && this.productId) {
       this.router.navigate(['/admin/product-management/ingredient-picker', this.productId]);
     } else {
-      // Nota: Si es nuevo producto, aquí podrías guardar el estado
-      // en un servicio temporal si quieres volver con los datos escritos.
       this.router.navigate(['/admin/product-management/ingredient-picker']);
     }
   }
 
-  goBack() { this.location.back(); }
+  onSubmit() {
+    if (this.productForm.invalid) return;
+
+    // --- TRANSFORMACIÓN DE DATOS PARA EL BACKEND ---
+    // Esto convierte el array plano del formulario en el objeto {ingredient: {id: X}} que JPA espera
+    const rawValue = this.productForm.value;
+    const formattedIngredients = this.ingredientsArray.value.map((item: any) => ({
+        ingredient: { id: item.id }, // <--- EL BACKEND NECESITA ESTA ESTRUCTURA
+        isDefault: item.isDefault || false
+    }));
+
+    const payload = {
+        ...rawValue,
+        productIngredients: formattedIngredients
+    };
+    // -------------------------------------------------
+
+    this.selectionService.clear();
+
+    if (this.isEditMode && this.productId) {
+      this.productService.updateProduct(this.productId, payload).subscribe({
+        next: () => this.router.navigate(['/admin/product-management/product-list']),
+        error: (err) => console.error("Error al actualizar", err)
+      });
+    } else {
+      this.productService.createProduct(payload).subscribe({
+        next: () => this.router.navigate(['/admin/product-management/product-list']),
+        error: (err) => console.error("Error al crear", err)
+      });
+    }
+  }
+
+  goBack() {
+    this.selectionService.clear();
+    this.router.navigate(['/admin/product-management/product-list']);
+  }
 }

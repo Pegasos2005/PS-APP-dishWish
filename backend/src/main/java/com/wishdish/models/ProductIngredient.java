@@ -19,7 +19,6 @@ public class ProductIngredient {
 
     @ManyToOne
     @JoinColumn(name = "ingredient_id")
-    @JsonIgnore
     private Ingredient ingredient;
 
     @Column(name = "is_default")
@@ -71,5 +70,18 @@ public class ProductIngredient {
 
     public void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProductIngredient)) return false;
+        ProductIngredient that = (ProductIngredient) o;
+        return id != null && id.equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
